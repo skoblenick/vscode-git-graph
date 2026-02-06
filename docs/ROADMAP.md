@@ -65,10 +65,12 @@ Goal: Break up `web/main.ts` monolith for maintainability.
 | Task | Status | Notes |
 |------|--------|-------|
 | Extract state management | ⬜ | Separate from rendering |
-| Extract message handlers | ⬜ | One module per command type |
+| Extract message handlers | ✅ | Extracted to `web/messageHandler.ts` — `handleMessage()` function with all response processing |
 | Extract renderers | ⬜ | Table, detail pane, dialogs |
-| Consider lightweight framework | ⬜ | Svelte? Or stay vanilla DOM |
+| Consider lightweight framework | ❌ | Staying vanilla DOM — no framework needed for this refactor |
 | Add webview tests | ⬜ | Currently untested |
+| Extract helper functions | ✅ | Extracted `web/fileTree.ts`, `web/repoStateHelpers.ts`, `web/miscHelpers.ts` — file tree, repo state, and misc helpers |
+| Deterministic build ordering | ✅ | `esbuild-web.js` now sorts middle JS files alphabetically |
 
 ---
 
@@ -123,6 +125,7 @@ Track new features here as they're planned.
 
 | Date | Change |
 |------|--------|
+| 2026-02-06 | **Phase 3 Progress — Webview Refactor**: Extracted `web/main.ts` (3964→3195 lines) into 4 new modules: `web/messageHandler.ts` (message handler switch), `web/fileTree.ts` (file tree helpers), `web/miscHelpers.ts` (misc helpers), `web/repoStateHelpers.ts` (repo state helpers). Made esbuild-web.js concatenation order deterministic. GitGraphView class remains in main.ts for further extraction. |
 | 2026-02-06 | **Phase 2 Complete**: Reduced activation from `*` to `onStartupFinished` for deferred loading. Migrated backend build from tsc to esbuild (3 bundled entry points in ~26ms). Replaced UglifyJS with esbuild transform for webview minification. Removed unnecessary `original-fs` patching. Added source maps for backend debugging. Removed `uglify-js` devDependency. Added `typecheck` script for standalone type checking. |
 | 2026-02-06 | **Wrap up Phase 1 tech debt**: Updated CI to use `--frozen-lockfile`, added `pnpm audit --audit-level high` step, upgraded `actions/checkout` to v4. Removed resolved debt items (no lockfile, ancient deps). All Phase 1 tasks now ✅. |
 | 2026-02-06 | **Fix test infrastructure**: Fixed Jest 29 modern fake timers not spying on setTimeout/clearTimeout (bufferedQueue, dataSource), waitForExpect leaking intervals, Date mock fragility with globalThis, spawn signal handling (code null), url.parse behavior change, removed stale `@types/node` ref from test tsconfig, migrated jest.config.js to modern ts-jest format. All 15 test suites pass (1269 tests), zero warnings. |

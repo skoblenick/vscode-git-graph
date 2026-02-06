@@ -101,7 +101,11 @@ Communication is via **postMessage** with a typed request/response protocol.
 
 | File | Responsibility |
 |------|----------------|
-| `main.ts` | **Monolithic UI controller**. 170KB+. Handles all rendering, state, events, message dispatch. ⚠️ Primary tech debt target. |
+| `main.ts` | **UI controller** (~3200 lines, partially refactored). GitGraphView class: rendering, state, events. ⚠️ Further extraction planned. |
+| `messageHandler.ts` | Response message dispatch (switch on command). |
+| `fileTree.ts` | File tree building/rendering/state for CDV. |
+| `miscHelpers.ts` | Misc helpers: haveFilesChanged, abbrevCommit, getRepoDropdownOptions, etc. |
+| `repoStateHelpers.ts` | Repository state defaults: getShowRemoteBranches, getCommitOrdering, etc. |
 | `graph.ts` | Graph visualization. Draws branch lines, commit dots. |
 | `utils.ts` | DOM helpers, `sendMessage()`, escaping, formatting. |
 | `dialog.ts` | Modal dialog component. |
@@ -209,4 +213,4 @@ img-src data:;
 
 ---
 
-**Last updated**: 2026-02-03
+**Last updated**: 2026-02-06

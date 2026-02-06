@@ -14,13 +14,19 @@ const OUTPUT_MIN_JS_FILE = 'out.min.js';
 
 const DEBUG = process.argv.includes('debug');
 
-let packageJsFiles = [path.join(MEDIA_DIRECTORY, UTILS_JS_FILE)];
+const middleJsFiles = [];
 fs.readdirSync(MEDIA_DIRECTORY).forEach((fileName) => {
 	if (fileName.endsWith('.js') && fileName !== OUTPUT_MIN_JS_FILE && fileName !== UTILS_JS_FILE && fileName !== MAIN_JS_FILE) {
-		packageJsFiles.push(path.join(MEDIA_DIRECTORY, fileName));
+		middleJsFiles.push(fileName);
 	}
 });
-packageJsFiles.push(path.join(MEDIA_DIRECTORY, MAIN_JS_FILE));
+middleJsFiles.sort((a, b) => a.localeCompare(b));
+
+let packageJsFiles = [
+	path.join(MEDIA_DIRECTORY, UTILS_JS_FILE),
+	...middleJsFiles.map(f => path.join(MEDIA_DIRECTORY, f)),
+	path.join(MEDIA_DIRECTORY, MAIN_JS_FILE)
+];
 
 let packageCssFiles = [path.join(STYLES_DIRECTORY, MAIN_CSS_FILE)];
 fs.readdirSync(STYLES_DIRECTORY).forEach((fileName) => {
