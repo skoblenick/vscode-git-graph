@@ -68,7 +68,8 @@ export function isPathInWorkspace(path: string) {
  */
 export function realpath(path: string, native: boolean = false) {
 	return new Promise<string>((resolve) => {
-		(native ? fs.realpath.native : fs.realpath)(path, (err, resolvedPath) => resolve(err !== null ? path : getPathFromUri(vscode.Uri.file(resolvedPath))));
+		const realpathFunc = native ? fs.realpath.native : fs.realpath;
+		realpathFunc(path, (err: NodeJS.ErrnoException | null, resolvedPath: string) => resolve(err !== null ? path : getPathFromUri(vscode.Uri.file(resolvedPath))));
 	});
 }
 
@@ -604,23 +605,27 @@ export function resolveSpawnOutput(cmd: cp.ChildProcess) {
 				resolve({ code: -1, error: error });
 				resolved = true;
 			});
-			cmd.on('exit', (code) => {
+			cmd.on('exit', (code, signal) => {
 				if (resolved) return;
-				resolve({ code: code, error: null });
+				if (signal) {
+					resolve({ code: -1, error: new Error('Process terminated by signal ' + signal) });
+				} else {
+					resolve({ code: code ?? 0, error: null });
+				}
 				resolved = true;
 			});
 		}),
 		new Promise<Buffer>((resolve) => {
 			// stdout promise
 			let buffers: Buffer[] = [];
-			cmd.stdout.on('data', (b: Buffer) => { buffers.push(b); });
-			cmd.stdout.on('close', () => resolve(Buffer.concat(buffers)));
+			cmd.stdout!.on('data', (b: Buffer) => { buffers.push(b); });
+			cmd.stdout!.on('close', () => resolve(Buffer.concat(buffers)));
 		}),
 		new Promise<string>((resolve) => {
 			// stderr promise
 			let stderr = '';
-			cmd.stderr.on('data', (d) => { stderr += d; });
-			cmd.stderr.on('close', () => resolve(stderr));
+			cmd.stderr!.on('data', (d) => { stderr += d; });
+			cmd.stderr!.on('close', () => resolve(stderr));
 		})
 	]);
 }

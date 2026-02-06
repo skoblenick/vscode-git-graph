@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { AvatarManager } from './avatarManager';
 import { getConfig } from './config';
-import { DataSource, GitCommitDetailsData, GitConfigKey } from './dataSource';
+import { DataSource, GitConfigKey } from './dataSource';
 import { ExtensionState } from './extensionState';
 import { Logger } from './logger';
 import { RepoFileWatcher } from './repoFileWatcher';
@@ -235,17 +235,17 @@ export class GitGraphView extends Disposable {
 				});
 				break;
 			case 'commitDetails':
-				let data = await Promise.all<GitCommitDetailsData, string | null>([
+				let data = await Promise.all([
 					msg.commitHash === UNCOMMITTED
 						? this.dataSource.getUncommittedDetails(msg.repo)
 						: msg.stash === null
 							? this.dataSource.getCommitDetails(msg.repo, msg.commitHash, msg.hasParents)
 							: this.dataSource.getStashDetails(msg.repo, msg.commitHash, msg.stash),
 					msg.avatarEmail !== null ? this.avatarManager.getAvatarImage(msg.avatarEmail) : Promise.resolve(null)
-				]);
+				] as const);
 				this.sendMessage({
 					command: 'commitDetails',
-					...data[0],
+					...(data[0] as any),
 					avatar: data[1],
 					codeReview: msg.commitHash !== UNCOMMITTED ? this.extensionState.getCodeReview(msg.repo, msg.commitHash) : null,
 					refresh: msg.refresh

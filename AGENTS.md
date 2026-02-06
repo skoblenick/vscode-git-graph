@@ -57,13 +57,10 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for detailed task tracking.
 
-### Phase 1: Stabilization (Current)
-- [ ] Add package-lock.json
-- [ ] Update CI to modern Node LTS
-- [ ] Update dependencies (TypeScript, Jest, ESLint)
-- [ ] Bump minimum VS Code engine version
+### Phase 1: Stabilization — ✅ Complete
+All tasks done: Node 20, TypeScript 5.9, ESLint 8, Jest 29, vscode engine 1.70, frozen lockfile, pnpm audit in CI.
 
-### Phase 2: Modernization
+### Phase 2: Build Modernization (Current)
 - [ ] Reduce activation scope from `*` to on-demand
 - [ ] Modernize build pipeline (consider esbuild/vite)
 - [ ] Refactor monolithic `web/main.ts`
@@ -103,4 +100,28 @@ Tests use Jest with mocked VS Code API (`tests/mocks/vscode.ts`) and mocked git 
 
 ---
 
-**⚠️ AI AGENTS: Keep this file and docs/ updated when making changes.**
+## 📋 Roadmap Maintenance
+
+**⚠️ ALL AI AGENTS: After completing any task or feature:**
+
+1. **Update `docs/ROADMAP.md`** immediately:
+   - Change task status: ⬜ → 🟡 (in progress) → ✅ (complete)
+   - Add notes about any blockers or discoveries
+   - Update the "Changelog" section with date and summary
+   
+2. **Follow dependency order** in Phase 1:
+   ```
+   1. Add package-lock.json
+   2. Update Node in CI
+   3. Update TypeScript + @types
+   4. Update ESLint + Jest
+   5. Bump vscode engine + @types/vscode
+   6. Update iconv-lite (test encoding edge cases)
+   ```
+
+3. **Always verify** changes:
+   - Run `pnpm compile` and fix any TypeScript errors
+   - Run `pnpm test` and ensure tests pass
+   - Run `pnpm lint` for code quality
+
+**Current Phase Priority: Phase 1 - Stabilization (Node/TypeScript/Dependencies)**

@@ -1,12 +1,23 @@
-const RealDate = Date;
+const RealDate = globalThis.Date;
 const InitialNow = 1587559258;
 
 export let now = InitialNow;
 
-class MockDate extends RealDate {
-	constructor(now: number) {
-		super(now);
+export class MockDate extends RealDate {
+	constructor(...args: any[]) {
+		if (args.length === 0) {
+			super(now * 1000);
+		} else {
+			super(...(args as [any]));
+		}
 	}
+
+	public static now() {
+		return now * 1000;
+	}
+
+	public static parse = RealDate.parse;
+	public static UTC = RealDate.UTC;
 
 	public getFullYear() {
 		return this.getUTCFullYear();
@@ -38,20 +49,12 @@ class MockDate extends RealDate {
 }
 
 beforeEach(() => {
-	// Reset now to its initial value
 	now = InitialNow;
-
-	// Override Date
-	Date = class extends RealDate {
-		constructor() {
-			super();
-			return new MockDate(now * 1000);
-		}
-	} as DateConstructor;
+	globalThis.Date = MockDate as unknown as DateConstructor;
 });
 
 afterEach(() => {
-	Date = RealDate;
+	globalThis.Date = RealDate;
 });
 
 export function setCurrentTime(newNow: number) {

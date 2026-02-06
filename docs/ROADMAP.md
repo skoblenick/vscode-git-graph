@@ -15,16 +15,21 @@ Goal: Make the codebase maintainable and CI reliable.
 
 | Task | Status | Notes |
 |------|--------|-------|
-| Add `package-lock.json` | ⬜ | Reproducible builds, security audits |
-| Update CI to Node LTS (20.x or 22.x) | ⬜ | Currently Node 12 (EOL) |
-| Run `npm audit` in CI | ⬜ | After lockfile added |
-| Update TypeScript to 5.x | ⬜ | Currently 4.0.2 |
-| Update ESLint to 8.x+ | ⬜ | Currently 7.15.0 |
-| Update Jest to 29.x | ⬜ | Currently 26.6.3 |
-| Update `@types/node` | ⬜ | Currently 8.10.62 |
-| Bump `engines.vscode` to 1.70+ | ⬜ | Currently 1.38 (2019) |
-| Update `@types/vscode` to match | ⬜ | |
-| Update `iconv-lite` | ⬜ | Currently 0.5.0, latest 0.6.x |
+| Add `package-lock.json` | ✅ | Skipped - using pnpm-lock.yaml with pnpm 9.0.0 |
+| Update CI to Node LTS (20.x or 22.x) | ✅ | Updated to Node 20.x, added pnpm setup action |
+| Run `pnpm audit` in CI | ✅ | Added `pnpm audit --audit-level high` step to CI |
+| Update TypeScript to 5.x | ✅ | Upgraded to 5.9.3, fixed type compatibility issues |
+| Update ESLint to 8.x+ | ✅ | Upgraded to 8.57.1 with @typescript-eslint 7.x |
+| Update Jest to 29.x | ✅ | Upgraded to 29.7.0 with ts-jest 29.x |
+| Update `@types/node` | ✅ | Upgraded to latest, removed custom types |
+| Bump `engines.vscode` to 1.70+ | ✅ | Updated to 1.70.0 |
+| Update `@types/vscode` to match | ✅ | Updated to 1.70.0, fixed mock types |
+| Update `iconv-lite` | ✅ | Upgraded to 0.6.3 |
+| Update `uglify-js` | ✅ | Upgraded to 3.19.3 for ES6 support |
+| Update web target to ES6 | ✅ | Changed web/tsconfig.json target from es5 to es6 |
+| Fix Timer → Timeout types | ✅ | Updated all NodeJS.Timer to NodeJS.Timeout |
+| Fix test mock types | ✅ | Updated ExtensionContext and WebviewPanel mocks for new vscode types |
+| Fix test infrastructure (Jest 29 compat) | ✅ | Fixed fake timer spying, Date mock, waitForExpect leak, spawn signal handling, url.parse behavior |
 
 ### Phase 1 Dependency Order
 
@@ -95,8 +100,7 @@ Track new features here as they're planned.
 |------|----------|--------|
 | Monolithic UI controller | `web/main.ts` | Hard to maintain/test |
 | Activation `*` | `package.json` | Perf impact on all users |
-| No lockfile | project root | Build reproducibility |
-| Ancient dependencies | `package.json` | Security, compatibility |
+| ~~CI install not frozen~~ | ~~`.github/workflows/`~~ | ✅ Resolved — using `--frozen-lockfile` |
 
 ### Moderate
 
@@ -119,6 +123,9 @@ Track new features here as they're planned.
 
 | Date | Change |
 |------|--------|
+| 2026-02-06 | **Wrap up Phase 1 tech debt**: Updated CI to use `--frozen-lockfile`, added `pnpm audit --audit-level high` step, upgraded `actions/checkout` to v4. Removed resolved debt items (no lockfile, ancient deps). All Phase 1 tasks now ✅. |
+| 2026-02-06 | **Fix test infrastructure**: Fixed Jest 29 modern fake timers not spying on setTimeout/clearTimeout (bufferedQueue, dataSource), waitForExpect leaking intervals, Date mock fragility with globalThis, spawn signal handling (code null), url.parse behavior change, removed stale `@types/node` ref from test tsconfig, migrated jest.config.js to modern ts-jest format. All 15 test suites pass (1269 tests), zero warnings. |
+| 2026-02-06 | **Phase 1 Complete**: Updated Node 12→20, TypeScript 4→5.9, ESLint 7→8, Jest 26→29, all @types packages, and vscode engine 1.38→1.70. Fixed type compatibility issues (Timer→Timeout, Promise types), removed old custom @types/node, updated UglifyJS 3.10→3.19 for ES6, updated web build target to ES6, and fixed all test mock types for new vscode API. All code compiles cleanly with `pnpm compile`. |
 | 2026-02-03 | Initial roadmap created |
 
 ---

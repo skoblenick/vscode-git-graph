@@ -5907,6 +5907,7 @@ describe('DataSource', () => {
 		it('Should launch the interactive rebase of the current branch on a branch in a terminal', async () => {
 			// Setup
 			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 			const spyOnOpenGitTerminal = jest.spyOn(utils, 'openGitTerminal');
 			spyOnOpenGitTerminal.mockReturnValueOnce();
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
@@ -5919,6 +5920,7 @@ describe('DataSource', () => {
 
 			// Run
 			jest.runOnlyPendingTimers();
+			(global.setTimeout as unknown as jest.SpyInstance).mockRestore();
 			jest.useRealTimers();
 			const result = await resultPromise;
 
@@ -5930,6 +5932,7 @@ describe('DataSource', () => {
 		it('Should launch the interactive rebase of the current branch on a commit in a terminal', async () => {
 			// Setup
 			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 			const spyOnOpenGitTerminal = jest.spyOn(utils, 'openGitTerminal');
 			spyOnOpenGitTerminal.mockReturnValueOnce();
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
@@ -5942,6 +5945,7 @@ describe('DataSource', () => {
 
 			// Run
 			jest.runOnlyPendingTimers();
+			(global.setTimeout as unknown as jest.SpyInstance).mockRestore();
 			jest.useRealTimers();
 			const result = await resultPromise;
 
@@ -5953,6 +5957,7 @@ describe('DataSource', () => {
 		it('Should launch the interactive rebase of the current branch on a branch in a terminal (signing the new commits)', async () => {
 			// Setup
 			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 			const spyOnOpenGitTerminal = jest.spyOn(utils, 'openGitTerminal');
 			spyOnOpenGitTerminal.mockReturnValueOnce();
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', true);
@@ -5965,6 +5970,7 @@ describe('DataSource', () => {
 
 			// Run
 			jest.runOnlyPendingTimers();
+			(global.setTimeout as unknown as jest.SpyInstance).mockRestore();
 			jest.useRealTimers();
 			const result = await resultPromise;
 
@@ -6631,6 +6637,7 @@ describe('DataSource', () => {
 		it('Should launch a gui directory diff (for one commit)', async () => {
 			// Setup
 			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 			mockGitSuccessOnce();
 
 			// Run
@@ -6641,6 +6648,7 @@ describe('DataSource', () => {
 
 			// Run
 			jest.runOnlyPendingTimers();
+			(global.setTimeout as unknown as jest.SpyInstance).mockRestore();
 			jest.useRealTimers();
 			const result = await resultPromise;
 
@@ -6654,6 +6662,7 @@ describe('DataSource', () => {
 		it('Should launch a gui directory diff (between two commits)', async () => {
 			// Setup
 			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 			mockGitSuccessOnce();
 
 			// Run
@@ -6664,6 +6673,7 @@ describe('DataSource', () => {
 
 			// Run
 			jest.runOnlyPendingTimers();
+			(global.setTimeout as unknown as jest.SpyInstance).mockRestore();
 			jest.useRealTimers();
 			const result = await resultPromise;
 
@@ -6677,6 +6687,7 @@ describe('DataSource', () => {
 		it('Should launch a gui directory diff (for uncommitted changes)', async () => {
 			// Setup
 			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 			mockGitSuccessOnce();
 
 			// Run
@@ -6687,6 +6698,7 @@ describe('DataSource', () => {
 
 			// Run
 			jest.runOnlyPendingTimers();
+			(global.setTimeout as unknown as jest.SpyInstance).mockRestore();
 			jest.useRealTimers();
 			const result = await resultPromise;
 
@@ -6700,6 +6712,7 @@ describe('DataSource', () => {
 		it('Should launch a gui directory diff (between a commit and the uncommitted changes)', async () => {
 			// Setup
 			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 			mockGitSuccessOnce();
 
 			// Run
@@ -6710,6 +6723,7 @@ describe('DataSource', () => {
 
 			// Run
 			jest.runOnlyPendingTimers();
+			(global.setTimeout as unknown as jest.SpyInstance).mockRestore();
 			jest.useRealTimers();
 			const result = await resultPromise;
 
@@ -6723,6 +6737,7 @@ describe('DataSource', () => {
 		it('Should launch a directory diff in a terminal (between two commits)', async () => {
 			// Setup
 			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 			const spyOnOpenGitTerminal = jest.spyOn(utils, 'openGitTerminal');
 			spyOnOpenGitTerminal.mockReturnValueOnce();
 
@@ -6734,6 +6749,7 @@ describe('DataSource', () => {
 
 			// Run
 			jest.runOnlyPendingTimers();
+			(global.setTimeout as unknown as jest.SpyInstance).mockRestore();
 			jest.useRealTimers();
 			const result = await resultPromise;
 
@@ -6757,6 +6773,7 @@ describe('DataSource', () => {
 		it('Should display the error message when the diff tool doesn\'t exit successfully', async () => {
 			// Setup
 			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 			mockGitThrowingErrorOnce('line1\nline2\nline3');
 			vscode.window.showErrorMessage.mockResolvedValueOnce(null);
 
@@ -6768,6 +6785,7 @@ describe('DataSource', () => {
 
 			// Run
 			jest.runOnlyPendingTimers();
+			(global.setTimeout as unknown as jest.SpyInstance).mockRestore();
 			jest.useRealTimers();
 			const result = await resultPromise;
 

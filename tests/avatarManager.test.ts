@@ -72,9 +72,10 @@ describe('AvatarManager', () => {
 				identicon: true
 			}
 		});
-		avatarManager = new AvatarManager(dataSource, extensionState, logger);
 		jest.clearAllTimers();
 		jest.useRealTimers();
+		globalThis.Date = date.MockDate as unknown as DateConstructor;
+		avatarManager = new AvatarManager(dataSource, extensionState, logger);
 	});
 	afterEach(() => {
 		avatarManager.dispose();
@@ -134,8 +135,8 @@ describe('AvatarManager', () => {
 					timeout: 15000
 				}, expect.anything());
 				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'avatar-url',
-					path: '/&size=162',
+					hostname: 'avatar-url&size=162',
+					path: '/',
 					headers: { 'User-Agent': 'vscode-git-graph' },
 					agent: false,
 					timeout: 15000
@@ -184,8 +185,8 @@ describe('AvatarManager', () => {
 					timeout: 15000
 				}, expect.anything());
 				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'avatar-url',
-					path: '/&size=162',
+					hostname: 'avatar-url&size=162',
+					path: '/',
 					headers: { 'User-Agent': 'vscode-git-graph' },
 					agent: false,
 					timeout: 15000
@@ -303,8 +304,8 @@ describe('AvatarManager', () => {
 					timeout: 15000
 				}, expect.anything());
 				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'avatar-url',
-					path: '/&size=162',
+					hostname: 'avatar-url&size=162',
+					path: '/',
 					headers: { 'User-Agent': 'vscode-git-graph' },
 					agent: false,
 					timeout: 15000
@@ -1348,6 +1349,7 @@ describe('AvatarManager', () => {
 			// Setup
 			spyOnGetRemoteUrl.mockResolvedValueOnce(null);
 			jest.useFakeTimers();
+			globalThis.Date = date.MockDate as unknown as DateConstructor;
 			mockHttpsResponse(200, 'binary-image-data-one');
 			mockWriteFile(null);
 			mockReadFile('binary-image-data-one');

@@ -24,20 +24,35 @@ let mockedWebviews: { panel: vscode.WebviewPanel, mocks: WebviewPanelMocks }[] =
 export const mocks = {
 	extensionContext: {
 		asAbsolutePath: jest.fn(),
+		environmentVariableCollection: {} as any,
+		extension: {} as any,
+		extensionMode: 1 as any,
 		extensionPath: '/path/to/extension',
+		extensionUri: {} as any,
 		globalState: {
 			get: jest.fn(),
-			update: jest.fn()
-		},
+			update: jest.fn(),
+			setKeysForSync: jest.fn()
+		} as any,
 		globalStoragePath: '/path/to/globalStorage',
+		globalStorageUri: {} as any,
 		logPath: '/path/to/logs',
+		logUri: {} as any,
+		secrets: {
+			get: jest.fn(),
+			store: jest.fn(),
+			delete: jest.fn(),
+			onDidChange: jest.fn()
+		} as any,
 		storagePath: '/path/to/storage',
+		storageUri: {} as any,
 		subscriptions: [],
 		workspaceState: {
 			get: jest.fn(),
-			update: jest.fn()
-		}
-	},
+			update: jest.fn(),
+			setKeysForSync: jest.fn()
+		} as any
+	} as any,
 	outputChannel: {
 		appendLine: jest.fn(),
 		dispose: jest.fn()
@@ -214,6 +229,7 @@ function createWebviewPanel(viewType: string, title: string, _showOptions: ViewC
 		reveal: jest.fn((_viewColumn?: ViewColumn, _preserveFocus?: boolean) => { }),
 		title: title,
 		visible: true,
+		viewColumn: undefined,
 		viewType: viewType,
 		webview: {
 			asWebviewUri: jest.fn((uri: Uri) => uri.with({ scheme: 'vscode-webview-resource', path: 'file//' + uri.path.replace(/\\/g, '/') })),
