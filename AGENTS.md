@@ -60,9 +60,10 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for detailed task tracking.
 ### Phase 1: Stabilization — ✅ Complete
 All tasks done: Node 20, TypeScript 5.9, ESLint 8, Jest 29, vscode engine 1.70, frozen lockfile, pnpm audit in CI.
 
-### Phase 2: Build Modernization (Current)
-- [ ] Reduce activation scope from `*` to on-demand
-- [ ] Modernize build pipeline (consider esbuild/vite)
+### Phase 2: Build Modernization — ✅ Complete
+All tasks done: Activation reduced to `onStartupFinished`, esbuild for backend + webview minification, original-fs patching removed, source maps added.
+
+### Phase 3: Webview Refactor (Current)
 - [ ] Refactor monolithic `web/main.ts`
 
 ## Code Conventions
@@ -85,9 +86,6 @@ Tests use Jest with mocked VS Code API (`tests/mocks/vscode.ts`) and mocked git 
 ## Known Technical Debt
 
 1. **`web/main.ts`** — 170KB+ monolithic UI controller
-2. **Activation `*`** — Extension loads on every VS Code start
-3. **Custom build pipeline** — Concat + UglifyJS instead of modern bundler
-4. **Old dependencies** — Node 12 in CI, TS 4.0, VS Code 1.38 engine
 
 ## Documentation Index
 

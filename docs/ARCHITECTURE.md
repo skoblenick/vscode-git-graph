@@ -146,21 +146,23 @@ Defined in `src/types.ts`:
 
 ## Build Pipeline
 
-### Backend Build (`npm run compile-src`)
+### Backend Build (`pnpm run compile-src`)
 
 ```
-src/*.ts  ──► tsc ──► out/*.js  ──► package-src.js (patches require("fs"))
+src/*.ts  ──► esbuild (bundle, CJS, node16)  ──► out/extension.js
+              3 entry points:                     out/askpass/askpassMain.js
+              + tsc --emitDeclarationOnly          out/life-cycle/uninstall.js
+              + copy askpass .sh scripts           out/types.d.ts (for webview)
 ```
 
-### Frontend Build (`npm run compile-web`)
+### Frontend Build (`pnpm run compile-web`)
 
 ```
-web/*.ts  ──► tsc ──► media/*.js  ──► package-web.js ──► media/out.min.js
-                                            │
-web/styles/*.css  ──────────────────────────┴──► media/out.min.css
+web/*.ts  ──► tsc (module: none) ──► media/*.js  ──► concat IIFE ──► esbuild minify ──► media/out.min.js
+web/styles/*.css  ──────────────────────────────────── concat ───────────────────────►  media/out.min.css
 ```
 
-`package-web.js` concatenates all JS into one IIFE, then minifies with UglifyJS.
+The webview uses `module: none` (global scripts), so files are concatenated in order (utils first, main last) and wrapped in an IIFE before esbuild minification.
 
 ## Security
 
@@ -182,7 +184,7 @@ img-src data:;
 
 ### Startup
 
-1. `extension.ts` activates on `*` (any workspace)
+1. `extension.ts` activates on `onStartupFinished` (deferred) or `onCommand:` (any registered command)
 2. Creates `DataSource`, `RepoManager`, `ExtensionState`, etc.
 3. `RepoManager` discovers git repos in workspace
 4. User opens Git Graph → `GitGraphView` creates WebviewPanel

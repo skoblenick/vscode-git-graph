@@ -37,7 +37,7 @@
 		"workspace"
 	],
 	"activationEvents": [
-		"*"
+		"onStartupFinished"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -1517,9 +1517,10 @@
 		"vscode:uninstall": "node ./out/life-cycle/uninstall.js",
 		"clean": "node ./.vscode/clean.js",
 		"compile": "pnpm run lint && pnpm run clean && pnpm run compile-src && pnpm run compile-web",
-		"compile-src": "tsc -p ./src && node ./.vscode/package-src.js",
-		"compile-web": "tsc -p ./web && node ./.vscode/package-web.js",
-		"compile-web-debug": "tsc -p ./web && node ./.vscode/package-web.js debug",
+		"compile-src": "node ./.vscode/esbuild-backend.js",
+		"compile-web": "tsc -p ./web && node ./.vscode/esbuild-web.js",
+		"compile-web-debug": "tsc -p ./web && node ./.vscode/esbuild-web.js debug",
+		"typecheck": "tsc -p ./src --noEmit",
 		"lint": "eslint -c .eslintrc.json --max-warnings 0 --ext .ts ./src ./tests ./web",
 		"package": "vsce package",
 		"package-and-install": "pnpm run package && node ./.vscode/install-package.js",
@@ -1535,10 +1536,10 @@
 		"@types/vscode": "1.70.0",
 		"@typescript-eslint/eslint-plugin": "8.54.0",
 		"@typescript-eslint/parser": "8.54.0",
+		"esbuild": "^0.27.3",
 		"eslint": "8.57.1",
 		"jest": "29.7.0",
 		"ts-jest": "29.4.6",
-		"typescript": "5.9.3",
-		"uglify-js": "3.19.3"
+		"typescript": "5.9.3"
 	}
 }
