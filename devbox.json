@@ -1,0 +1,16 @@
+{
+  "packages": [
+    "nodejs@20",
+    "git@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo 'vscode-git-graph devbox environment loaded'"
+    ],
+    "scripts": {
+      "build": "npm run compile",
+      "test": "npm test",
+      "package": "npm run package"
+    }
+  }
+}
