@@ -4,6 +4,26 @@ View a Git Graph of your repository, and easily perform Git actions from the gra
 
 ![Recording of Git Graph](https://github.com/mhutchie/vscode-git-graph/raw/master/resources/demo.gif)
 
+## Installation & Setup
+
+### Using devbox (Recommended)
+
+```bash
+# Install devbox: https://www.jetpack.io/devbox
+devbox install
+devbox shell
+pnpm install
+pnpm compile
+```
+
+### Without devbox
+
+```bash
+# Requires Node.js 20+
+pnpm install
+pnpm compile
+```
+
 ## Features
 
 * Git Graph View:

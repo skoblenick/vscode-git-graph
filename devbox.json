@@ -5,12 +5,12 @@
   ],
   "shell": {
     "init_hook": [
-      "echo 'vscode-git-graph devbox environment loaded'"
+      "echo 'vscode-git-graph devbox environment loaded (Node 20 + pnpm via corepack)'"
     ],
     "scripts": {
-      "build": "npm run compile",
-      "test": "npm test",
-      "package": "npm run package"
+      "build": "pnpm compile",
+      "test": "pnpm test",
+      "package": "pnpm package"
     }
   }
 }

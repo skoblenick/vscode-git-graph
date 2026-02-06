@@ -5,12 +5,18 @@ This is a VS Code extension for visualizing Git history as a graph. This fork is
 ## Quick Commands
 
 ```bash
-npm install           # Install dependencies
-npm run compile       # Full build (lint → clean → compile-src → compile-web)
-npm run compile-src   # Backend only (src/ → out/)
-npm run compile-web   # Frontend only (web/ → media/)
-npm test              # Run Jest tests
-npm run package       # Create .vsix package
+# Via devbox (recommended):
+devbox shell          # Enter devbox environment
+pnpm install          # Install dependencies
+pnpm compile          # Full build (lint → clean → compile-src → compile-web)
+pnpm compile-src      # Backend only (src/ → out/)
+pnpm compile-web      # Frontend only (web/ → media/)
+pnpm test             # Run Jest tests
+pnpm package          # Create .vsix package
+
+# Or install devbox first:
+# https://www.jetpack.io/devbox
+# devbox install && devbox shell
 ```
 
 **Important:** Run `compile-src` before `compile-web` — webview types depend on backend output.
@@ -72,9 +78,9 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for detailed task tracking.
 ## Testing
 
 ```bash
-npm test                    # Run all tests
-npm test -- --watch         # Watch mode
-npm test -- path/to/test    # Single file
+pnpm test                    # Run all tests
+pnpm test -- --watch         # Watch mode
+pnpm test -- path/to/test    # Single file
 ```
 
 Tests use Jest with mocked VS Code API (`tests/mocks/vscode.ts`) and mocked git spawn (`tests/mocks/spawn.ts`).
