@@ -1,5 +1,16 @@
+
+
 coverage
 media
 node_modules
 out
 *.vsix
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+.envrc
+
+# Devbox
+.devbox
