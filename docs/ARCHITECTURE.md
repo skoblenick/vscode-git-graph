@@ -41,9 +41,10 @@ Communication is via **postMessage** with a typed request/response protocol.
 │                                                                          │
 │  ┌─────────────────────────────────────────────────────────────────┐    │
 │  │                         web/main.ts                              │    │
-│  │  GitGraphView class - monolithic UI controller                   │    │
-│  │  - State management       - Event handling                       │    │
-│  │  - DOM rendering          - Request/response dispatch            │    │
+│  │  GitGraphView class - UI controller (refactored)                 │    │
+│  │  - Core rendering         - Event handling                       │    │
+│  │  - State (via statePersistence), messages (via messageHandler)   │    │
+│  │  - Context menus, CDV, rendering extracted to own modules        │    │
 │  └─────────────────────────────────────────────────────────────────┘    │
 │                                    │                                     │
 │         ┌──────────────────────────┼──────────────────────────┐         │
@@ -87,6 +88,7 @@ Communication is via **postMessage** with a typed request/response protocol.
 | `repoFileWatcher.ts` | FileSystemWatcher for `.git/` changes. Triggers refresh with debounce. |
 | `statusBarItem.ts` | Status bar integration. Shows current branch. |
 | `commands.ts` | VS Code command registrations. |
+| `settingsMigration.ts` | One-time migration of deprecated settings to current keys. Runs on activation. |
 | `logger.ts` | Output channel logging. |
 
 ### Subdirectories
@@ -94,14 +96,18 @@ Communication is via **postMessage** with a typed request/response protocol.
 | Directory | Purpose |
 |-----------|---------|
 | `askpass/` | Git credential prompting via VS Code. IPC server for `GIT_ASKPASS`. |
-| `life-cycle/` | Install/update/uninstall telemetry (anonymous). |
+| `life-cycle/` | Lifecycle stubs (telemetry removed for privacy compliance). |
 | `utils/` | Shared utilities: `event.ts`, `bufferedQueue.ts`, `disposable.ts`. |
 
 ## Frontend Components (`web/`)
 
 | File | Responsibility |
 |------|----------------|
-| `main.ts` | **UI controller** (~3200 lines, partially refactored). GitGraphView class: rendering, state, events. ⚠️ Further extraction planned. |
+| `main.ts` | **UI controller** (~1410 lines, fully refactored). GitGraphView class: core rendering, state, events. |
+| `commitDetailsView.ts` | Commit details view rendering, resizing, file interaction, code review. |
+| `contextMenuActions.ts` | Context menu builders and action handlers for branches, commits, tags, stashes. |
+| `statePersistence.ts` | State save/restore: view state, repo state, column widths. |
+| `tableRenderer.ts` | Table and graph view rendering, fetch/refresh buttons, column visibility. |
 | `messageHandler.ts` | Response message dispatch (switch on command). |
 | `fileTree.ts` | File tree building/rendering/state for CDV. |
 | `miscHelpers.ts` | Misc helpers: haveFilesChanged, abbrevCommit, getRepoDropdownOptions, etc. |
@@ -166,7 +172,7 @@ web/*.ts  ──► tsc (module: none) ──► media/*.js  ──► concat II
 web/styles/*.css  ──────────────────────────────────── concat ───────────────────────►  media/out.min.css
 ```
 
-The webview uses `module: none` (global scripts), so files are concatenated in order (utils first, main last) and wrapped in an IIFE before esbuild minification.
+The webview uses `module: none` (global scripts). `.vscode/esbuild-web.js` concatenates JS files in deterministic order: `utils.js` first, then alphabetically sorted middle files, then `main.js` last. The result is wrapped in an IIFE. In production mode, esbuild minifies the output; in debug mode, output is unminified.
 
 ## Security
 
@@ -188,7 +194,7 @@ img-src data:;
 
 ### Startup
 
-1. `extension.ts` activates on `onStartupFinished` (deferred) or `onCommand:` (any registered command)
+1. `extension.ts` activates on `onStartupFinished` (deferred loading)
 2. Creates `DataSource`, `RepoManager`, `ExtensionState`, etc.
 3. `RepoManager` discovers git repos in workspace
 4. User opens Git Graph → `GitGraphView` creates WebviewPanel
@@ -213,4 +219,4 @@ img-src data:;
 
 ---
 
-**Last updated**: 2026-02-06
+**Last updated**: 2026-02-07

@@ -50,7 +50,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture.
 | `src/gitGraphView.ts` | Webview panel host, message routing |
 | `src/dataSource.ts` | Git command execution engine |
 | `src/types.ts` | Shared types (Request/Response protocol) |
-| `web/main.ts` | Main UI controller (1436 lines, refactored) |
+| `web/main.ts` | Main UI controller (~1410 lines, refactored) |
 | `web/graph.ts` | Graph rendering logic |
 | `web/statePersistence.ts` | State save/restore (extracted from main.ts) |
 | `web/tableRenderer.ts` | Table & graph rendering (extracted from main.ts) |
@@ -70,6 +70,15 @@ All tasks done: Activation reduced to `onStartupFinished`, esbuild for backend +
 
 ### Phase 3: Webview Refactor — ✅ Complete
 All tasks done: State persistence, message handlers, context menus, CDV, renderers, helpers extracted. 198 webview tests added across 9 test files. main.ts reduced from 3964 to 1436 lines.
+
+### Phase 4: Testing Improvements — ✅ Complete
+All tasks done: 34 new backend tests (askpass, lifecycle, startup, uninstall), deepened webview render/messageHandler coverage. 1634 tests, 28 suites.
+
+### Phase 5: Features & Debt Resolution — ✅ Complete
+All tasks done: Smart git-aware repo watching, telemetry removed for privacy, avatar rate-limit resilience, deprecated settings migration.
+
+### Phase 6: E2E / Integration Testing — ✅ Complete
+All tasks done: VS Code integration tests with @vscode/test-electron, Playwright Electron webview browser tests, CI with xvfb-run.
 
 ## Code Conventions
 
@@ -111,20 +120,10 @@ _None — all identified technical debt has been resolved._
    - Change task status: ⬜ → 🟡 (in progress) → ✅ (complete)
    - Add notes about any blockers or discoveries
    - Update the "Changelog" section with date and summary
-   
-2. **Follow dependency order** in Phase 1:
-   ```
-   1. Add package-lock.json
-   2. Update Node in CI
-   3. Update TypeScript + @types
-   4. Update ESLint + Jest
-   5. Bump vscode engine + @types/vscode
-   6. Update iconv-lite (test encoding edge cases)
-   ```
 
-3. **Always verify** changes:
+2. **Always verify** changes:
    - Run `pnpm compile` and fix any TypeScript errors
    - Run `pnpm test` and ensure tests pass
    - Run `pnpm lint` for code quality
 
-**Current Phase Priority: Phase 1 - Stabilization (Node/TypeScript/Dependencies)**
+**All planned phases are complete. Add new tasks to docs/ROADMAP.md as needed.**

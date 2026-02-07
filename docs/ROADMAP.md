@@ -78,7 +78,7 @@ Goal: Break up `web/main.ts` monolith for maintainability.
 
 ## Phase 4: Testing Improvements (Priority: Low) — ✅ Complete
 
-Unit + VM/jsdom coverage complete (1634 tests, 28 suites). E2E tests deferred to Phase 6.
+Unit + VM/jsdom coverage complete (1634 tests, 28 suites). E2E tests were completed in Phase 6.
 
 | Task                                  | Status | Notes                                                                                                                                         |
 | ------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -104,7 +104,7 @@ Goal: Resolve remaining technical debt and improve performance, privacy, and rel
 
 ---
 
-## Phase 6: E2E / Integration Testing (Priority: Optional, Deferred) — ✅ Complete
+## Phase 6: E2E / Integration Testing (Priority: Optional) — ✅ Complete
 
 Goal: Add end-to-end and integration tests that exercise the full VS Code runtime.
 
