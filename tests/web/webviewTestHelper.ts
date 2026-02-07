@@ -19,7 +19,7 @@ const GG_ENUMS: Record<string, any> = {
 	MergeActionOn: { Branch: 'Branch', RemoteTrackingBranch: 'Remote-tracking Branch', Commit: 'Commit' },
 	RebaseActionOn: { Branch: 'Branch', Commit: 'Commit' },
 	GitPushBranchMode: { Normal: '', Force: 'force', ForceWithLease: 'force-with-lease' },
-	GitResetMode: { Soft: 'soft', Mixed: 'mixed', Hard: 'hard' },
+	GitResetMode: { Soft: 'soft', Mixed: 'mixed', Hard: 'hard' }
 };
 
 export function createWebContext() {
@@ -52,7 +52,7 @@ export function createWebContext() {
 		acquireVsCodeApi: () => vsCodeApi,
 		initialState: createMinimalInitialState(),
 		globalState: createMinimalGlobalState(),
-		workspaceState: createMinimalWorkspaceState(),
+		workspaceState: createMinimalWorkspaceState()
 	};
 
 	const ctx = vm.createContext(sandbox);
@@ -134,7 +134,7 @@ export function loadWebFile(ctx: vm.Context, fileName: string) {
 			module: ts.ModuleKind.None,
 			strict: true,
 			noImplicitAny: true,
-			removeComments: true,
+			removeComments: true
 		},
 		fileName: filePath
 	});

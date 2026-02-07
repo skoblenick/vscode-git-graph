@@ -78,7 +78,8 @@ export const mocks = {
 		inspect: jest.fn((section: string) => ({
 			workspaceValue: mockedExtensionSettingValues[section],
 			globalValue: mockedExtensionSettingValues[section]
-		}))
+		})),
+		update: jest.fn(() => Promise.resolve())
 	}
 };
 
@@ -148,6 +149,21 @@ export class Uri implements vscode.Uri {
 		const comps = path.match(/([a-z]+):\/\/([^?#]+)(\?([^#]+)|())(#(.+)|())/)!;
 		return new Uri(comps[1], '', comps[2], comps[4], comps[6]);
 	}
+}
+
+export class RelativePattern {
+	public readonly base: string;
+	public readonly pattern: string;
+	constructor(base: string | vscode.Uri | vscode.WorkspaceFolder, pattern: string) {
+		this.base = typeof base === 'string' ? base : (base as any).uri ? (base as any).uri.fsPath : (base as vscode.Uri).fsPath;
+		this.pattern = pattern;
+	}
+}
+
+export enum ConfigurationTarget {
+	Global = 1,
+	Workspace = 2,
+	WorkspaceFolder = 3
 }
 
 export enum StatusBarAlignment {

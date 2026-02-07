@@ -8,6 +8,19 @@ import { Logger } from './logger';
 import { Disposable, toDisposable } from './utils/disposable';
 import { EventEmitter } from './utils/event';
 
+const MAX_AVATAR_ATTEMPTS = 5;
+
+const MIME_TO_EXT: { [subtype: string]: string } = {
+	'jpeg': 'jpg',
+	'jpg': 'jpg',
+	'png': 'png',
+	'gif': 'gif',
+	'webp': 'webp',
+	'svg+xml': 'svg'
+};
+
+const DEFAULT_RATE_LIMIT_BACKOFF = 300000; // 5 minutes
+
 /**
  * Manages fetching and caching Avatars.
  */
@@ -149,6 +162,11 @@ export class AvatarManager extends Disposable {
 			let avatarRequest = this.queue.takeItem();
 			if (avatarRequest === null) return; // No avatar can be checked at the current time
 
+			if (avatarRequest.attempts >= MAX_AVATAR_ATTEMPTS) {
+				this.logger.log('Avatar attempts exhausted for ' + maskEmail(avatarRequest.email));
+				return;
+			}
+
 			let remoteSource = await this.getRemoteSource(avatarRequest); // Fetch the remote source of the avatar
 			switch (remoteSource.type) {
 				case 'github':
@@ -252,7 +270,14 @@ export class AvatarManager extends Disposable {
 						return;
 					}
 				} else if (res.statusCode === 403) {
-					// Rate limit reached, try again after timeout
+					if (this.githubTimeout <= t) {
+						const resetHeader = res.headers['x-ratelimit-reset'];
+						if (resetHeader) {
+							this.githubTimeout = parseInt(resetHeader as string) * 1000;
+						} else {
+							this.githubTimeout = t + DEFAULT_RATE_LIMIT_BACKOFF;
+						}
+					}
 					this.queue.addItem(avatarRequest, this.githubTimeout, false);
 					return;
 				} else if (res.statusCode === 422 && avatarRequest.commits.length > avatarRequest.attempts + 1 && avatarRequest.attempts < 4) {
@@ -322,7 +347,14 @@ export class AvatarManager extends Disposable {
 						return;
 					}
 				} else if (res.statusCode === 429) {
-					// Rate limit reached, try again after timeout
+					if (this.gitLabTimeout <= t) {
+						const resetHeader = res.headers['ratelimit-reset'];
+						if (resetHeader) {
+							this.gitLabTimeout = parseInt(resetHeader as string) * 1000;
+						} else {
+							this.gitLabTimeout = t + DEFAULT_RATE_LIMIT_BACKOFF;
+						}
+					}
 					this.queue.addItem(avatarRequest, this.gitLabTimeout, false);
 					return;
 				} else if (res.statusCode! >= 500) {
@@ -386,9 +418,19 @@ export class AvatarManager extends Disposable {
 				res.on('data', (chunk: Buffer) => { imageBufferArray.push(chunk); });
 				res.on('end', () => {
 					if (res.statusCode === 200) { // If success response, save the image to the avatar folder
-						let format = res.headers['content-type']!.split('/')[1];
-						fs.writeFile(this.avatarStorageFolder + '/' + hash + '.' + format, Buffer.concat(imageBufferArray), err => {
-							complete(err ? null : hash + '.' + format);
+						const contentType = res.headers['content-type'];
+						if (!contentType || !contentType.startsWith('image/')) {
+							complete();
+							return;
+						}
+						const subtype = contentType.split(';')[0].substring(6);
+						const ext = MIME_TO_EXT[subtype];
+						if (!ext) {
+							complete();
+							return;
+						}
+						fs.writeFile(this.avatarStorageFolder + '/' + hash + '.' + ext, Buffer.concat(imageBufferArray), err => {
+							complete(err ? null : hash + '.' + ext);
 						});
 					} else {
 						complete();
@@ -476,8 +518,12 @@ class AvatarRequestQueue {
 	 * @param immediate Whether the avatar should be fetched immediately.
 	 */
 	public add(email: string, repo: string, remote: string | null, commits: string[], immediate: boolean) {
-		const existingRequest = this.queue.find((request) => request.email === email && request.repo === repo);
+		const existingRequest = this.queue.find((request) => request.email === email);
 		if (existingRequest) {
+			if (existingRequest.remote === null && remote !== null) {
+				existingRequest.repo = repo;
+				existingRequest.remote = remote;
+			}
 			commits.forEach((commit) => {
 				if (!existingRequest.commits.includes(commit)) {
 					existingRequest.commits.push(commit);

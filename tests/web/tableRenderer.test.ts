@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import * as vm from 'vm';
-import { createWebContext, loadWebFiles, createRepoState } from './webviewTestHelper';
+import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
 function createMockView(ctx: vm.Context, overrides: Record<string, any> = {}) {
 	const defaults: Record<string, any> = {
@@ -13,7 +13,7 @@ function createMockView(ctx: vm.Context, overrides: Record<string, any> = {}) {
 	ctx.mockView = {
 		getCurrentRepo: () => defaults.currentRepo,
 		getGitRepos: () => defaults.gitRepos,
-		getConfig: () => defaults.config,
+		getConfig: () => defaults.config
 	};
 
 	return defaults;
@@ -122,7 +122,7 @@ function createFullMockView(ctx: vm.Context, sandbox: Record<string, any>, overr
 		getRepoDropdown: () => mockBranchDropdown,
 		getGitRemotes: () => [],
 		getRefreshBtnElem: () => document.createElement('div'),
-		isRefreshInProgress: () => false,
+		isRefreshInProgress: () => false
 	};
 
 	sandbox.addListenerToClass = jest.fn();

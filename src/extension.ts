@@ -5,9 +5,9 @@ import { getConfig } from './config';
 import { DataSource } from './dataSource';
 import { DiffDocProvider } from './diffDocProvider';
 import { ExtensionState } from './extensionState';
-import { onStartUp } from './life-cycle/startup';
 import { Logger } from './logger';
 import { RepoManager } from './repoManager';
+import { migrateDeprecatedSettings } from './settingsMigration';
 import { StatusBarItem } from './statusBarItem';
 import { GitExecutable, UNABLE_TO_FIND_GIT_MSG, findGit, getGitExecutableFromPaths, showErrorMessage, showInformationMessage } from './utils';
 import { EventEmitter } from './utils/event';
@@ -19,6 +19,8 @@ import { EventEmitter } from './utils/event';
 export async function activate(context: vscode.ExtensionContext) {
 	const logger = new Logger();
 	logger.log('Starting Git Graph ...');
+
+	await migrateDeprecatedSettings(context);
 
 	const gitExecutableEmitter = new EventEmitter<GitExecutable>();
 	const onDidChangeGitExecutable = gitExecutableEmitter.subscribe;
@@ -82,7 +84,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	logger.log('Started Git Graph - Ready to use!');
 
 	extensionState.expireOldCodeReviews();
-	onStartUp(context).catch(() => { });
 }
 
 /**

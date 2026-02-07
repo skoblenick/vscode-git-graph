@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import * as vm from 'vm';
-import { createWebContext, loadWebFiles, createRepoState } from './webviewTestHelper';
+import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
 function createMockView(ctx: vm.Context, overrides: Record<string, any> = {}) {
 	const defaults: Record<string, any> = {

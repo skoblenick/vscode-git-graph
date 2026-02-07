@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import * as vm from 'vm';
-import { createWebContext, loadWebFiles, createRepoState } from './webviewTestHelper';
+import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
 describe('web/utils', () => {
 	let ctx: vm.Context;

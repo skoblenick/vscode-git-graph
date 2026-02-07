@@ -90,7 +90,7 @@ Tests use Jest with mocked VS Code API (`tests/mocks/vscode.ts`) and mocked git 
 
 ## Known Technical Debt
 
-1. **`web/main.ts`** — Refactored from 3964 to 1436 lines; remaining code is core class with observers, data loading, and CDV management
+_None — all identified technical debt has been resolved._
 
 ## Documentation Index
 

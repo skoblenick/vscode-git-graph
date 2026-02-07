@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import * as vm from 'vm';
-import { createWebContext, loadWebFiles, createRepoState } from './webviewTestHelper';
+import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
 function createMockView(ctx: vm.Context, overrides: Record<string, any> = {}) {
 	const defaults: Record<string, any> = {
@@ -50,7 +50,7 @@ function createMockView(ctx: vm.Context, overrides: Record<string, any> = {}) {
 		getFindWidget: () => ({ getState: () => defaults.findWidgetState }),
 		getSettingsWidget: () => ({ getState: () => defaults.settingsWidgetState }),
 		getConfig: () => defaults.config,
-		setExpandedCommit: (ec: any) => { defaults.expandedCommit = ec; },
+		setExpandedCommit: (ec: any) => { defaults.expandedCommit = ec; }
 	};
 
 	return defaults;

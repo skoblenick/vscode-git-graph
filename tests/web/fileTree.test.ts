@@ -320,7 +320,7 @@ describe('fileTree', () => {
 
 	describe('createFileTree', () => {
 		it('should create empty tree for empty file list', () => {
-			const result = vm.runInContext(`createFileTree('/repo', {}, [], null)`, ctx);
+			const result = vm.runInContext('createFileTree(\'/repo\', {}, [], null)', ctx);
 			expect(result.type).toBe('folder');
 			expect(result.contents).toEqual({});
 		});

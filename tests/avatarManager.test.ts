@@ -10,7 +10,7 @@ jest.mock('../src/logger');
 import * as fs from 'fs';
 import { ClientRequest, IncomingMessage } from 'http';
 import * as https from 'https';
-import { URL } from 'url';
+
 import { ConfigurationChangeEvent } from 'vscode';
 import { AvatarEvent, AvatarManager } from '../src/avatarManager';
 import { DataSource } from '../src/dataSource';

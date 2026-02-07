@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import * as vm from 'vm';
-import { createWebContext, loadWebFiles, createRepoState } from './webviewTestHelper';
+import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
 function allVisibility() {
 	return {
@@ -198,7 +198,7 @@ describe('contextMenuActions', () => {
 		it('should return correct structure', () => {
 			createMockView(ctx, sandbox);
 			createTarget(ctx, { ref: 'origin/feature' });
-			const result = vm.runInContext("buildRemoteBranchContextMenuActions(mockView, 'origin', mockTarget)", ctx);
+			const result = vm.runInContext('buildRemoteBranchContextMenuActions(mockView, \'origin\', mockTarget)', ctx);
 			expect(Array.isArray(result)).toBe(true);
 			expect(result.length).toBe(4);
 		});
@@ -206,7 +206,7 @@ describe('contextMenuActions', () => {
 		it('should extract remote branch name correctly for Copy action', () => {
 			createMockView(ctx, sandbox);
 			createTarget(ctx, { ref: 'origin/feature' });
-			const result = vm.runInContext("buildRemoteBranchContextMenuActions(mockView, 'origin', mockTarget)", ctx);
+			const result = vm.runInContext('buildRemoteBranchContextMenuActions(mockView, \'origin\', mockTarget)', ctx);
 			const copyAction = result[3].find((a: any) => a.title === 'Copy Branch Name to Clipboard');
 			expect(copyAction.visible).toBe(true);
 			copyAction.onClick();
@@ -288,7 +288,7 @@ describe('contextMenuActions', () => {
 	describe('deleteTagAction', () => {
 		it('should call runAction with deleteOnRemote', () => {
 			createMockView(ctx, sandbox);
-			vm.runInContext("deleteTagAction(mockView, 'v1.0', 'origin')", ctx);
+			vm.runInContext('deleteTagAction(mockView, \'v1.0\', \'origin\')', ctx);
 			expect(sandbox.dialog.showActionRunning).toHaveBeenCalledWith('Deleting Tag');
 			expect(vsCodeApi.postMessage).toHaveBeenCalledWith(
 				{ command: 'deleteTag', repo: '/repo', tagName: 'v1.0', deleteOnRemote: 'origin' }
