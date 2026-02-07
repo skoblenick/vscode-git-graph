@@ -50,8 +50,13 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture.
 | `src/gitGraphView.ts` | Webview panel host, message routing |
 | `src/dataSource.ts` | Git command execution engine |
 | `src/types.ts` | Shared types (Request/Response protocol) |
-| `web/main.ts` | Main UI controller (⚠️ monolithic, needs refactor) |
+| `web/main.ts` | Main UI controller (1436 lines, refactored) |
 | `web/graph.ts` | Graph rendering logic |
+| `web/statePersistence.ts` | State save/restore (extracted from main.ts) |
+| `web/tableRenderer.ts` | Table & graph rendering (extracted from main.ts) |
+| `web/commitDetailsView.ts` | Commit details view rendering |
+| `web/contextMenuActions.ts` | Context menu builders & actions |
+| `web/messageHandler.ts` | Message handler (response processing) |
 
 ## Current Status & Priorities
 
@@ -63,8 +68,8 @@ All tasks done: Node 20, TypeScript 5.9, ESLint 8, Jest 29, vscode engine 1.70, 
 ### Phase 2: Build Modernization — ✅ Complete
 All tasks done: Activation reduced to `onStartupFinished`, esbuild for backend + webview minification, original-fs patching removed, source maps added.
 
-### Phase 3: Webview Refactor (Current)
-- [ ] Refactor monolithic `web/main.ts`
+### Phase 3: Webview Refactor — ✅ Complete
+All tasks done: State persistence, message handlers, context menus, CDV, renderers, helpers extracted. 115 webview tests added. main.ts reduced from 3964 to 1436 lines.
 
 ## Code Conventions
 
@@ -85,7 +90,7 @@ Tests use Jest with mocked VS Code API (`tests/mocks/vscode.ts`) and mocked git 
 
 ## Known Technical Debt
 
-1. **`web/main.ts`** — 170KB+ monolithic UI controller
+1. **`web/main.ts`** — Refactored from 3964 to 1436 lines; remaining code is core class with observers, data loading, and CDV management
 
 ## Documentation Index
 

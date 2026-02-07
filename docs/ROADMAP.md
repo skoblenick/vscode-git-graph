@@ -64,11 +64,13 @@ Goal: Break up `web/main.ts` monolith for maintainability.
 
 | Task | Status | Notes |
 |------|--------|-------|
-| Extract state management | ⬜ | Separate from rendering |
+| Extract state management | ✅ | Extracted to `web/statePersistence.ts` (105 lines) — saveViewState, saveRepoState, saveColumnWidths, saveExpandedCommitLoading, saveRepoStateValue, restoreFromPrevState |
 | Extract message handlers | ✅ | Extracted to `web/messageHandler.ts` — `handleMessage()` function with all response processing |
-| Extract renderers | ⬜ | Table, detail pane, dialogs |
+| Extract context menu actions | ✅ | Extracted to `web/contextMenuActions.ts` (769 lines) — all branch, commit, remote branch, stash, tag, and uncommitted changes context menu builders + action helpers |
+| Extract commit details view | ✅ | Extracted to `web/commitDetailsView.ts` (654 lines) — CDV rendering, resizing, file interaction, code review, divider dragging |
+| Extract renderers | ✅ | Extracted to `web/tableRenderer.ts` (402 lines) — renderView, renderGraphView, renderTableView, renderUncommittedChanges, renderFetchButton, renderRefreshButton, renderTagDetails, renderRepoDropdownOptions, makeTableResizable, getColumnVisibility, getNumColumns |
 | Consider lightweight framework | ❌ | Staying vanilla DOM — no framework needed for this refactor |
-| Add webview tests | ⬜ | Currently untested |
+| Add webview tests | ✅ | 115 tests across 5 test files — repoStateHelpers, miscHelpers, statePersistence, tableRenderer, webUtils. Uses VM sandbox with jsdom to test `module: none` code |
 | Extract helper functions | ✅ | Extracted `web/fileTree.ts`, `web/repoStateHelpers.ts`, `web/miscHelpers.ts` — file tree, repo state, and misc helpers |
 | Deterministic build ordering | ✅ | `esbuild-web.js` now sorts middle JS files alphabetically |
 
@@ -100,7 +102,7 @@ Track new features here as they're planned.
 
 | Item | Location | Impact |
 |------|----------|--------|
-| Monolithic UI controller | `web/main.ts` | Hard to maintain/test |
+| Monolithic UI controller | `web/main.ts` (1436 lines, down from 3964) | Largely resolved — state persistence, renderers, context menus, CDV, message handler, helpers all extracted |
 | ~~Activation `*`~~ | ~~`package.json`~~ | ✅ Resolved — changed to `onStartupFinished` |
 | ~~CI install not frozen~~ | ~~`.github/workflows/`~~ | ✅ Resolved — using `--frozen-lockfile` |
 
@@ -125,6 +127,9 @@ Track new features here as they're planned.
 
 | Date | Change |
 |------|--------|
+| 2026-02-06 | **Phase 3 Complete**: Extracted state persistence to `web/statePersistence.ts` (105 lines) and renderers to `web/tableRenderer.ts` (402 lines). Added 115 webview unit tests across 5 files using VM sandbox + jsdom to test `module: none` code. main.ts now 1436 lines (down from 3964). All Phase 3 tasks ✅. |
+| 2026-02-06 | **Phase 3 Progress — CDV Extraction**: Extracted commit details view from `web/main.ts` into `web/commitDetailsView.ts` (654 lines). Includes renderCommitDetailsView, CDV resizing/divider, file view interaction, code review, closeCdvContextMenuIfOpen. main.ts now 1847 lines (down from 2484). Made isCdvDocked public. |
+| 2026-02-06 | **Phase 3 Progress — Context Menu Extraction**: Extracted context menu actions from `web/main.ts` into `web/contextMenuActions.ts` (769 lines). main.ts went from 3195→2484 lines. Added public getters on GitGraphView. |
 | 2026-02-06 | **Phase 3 Progress — Webview Refactor**: Extracted `web/main.ts` (3964→3195 lines) into 4 new modules: `web/messageHandler.ts` (message handler switch), `web/fileTree.ts` (file tree helpers), `web/miscHelpers.ts` (misc helpers), `web/repoStateHelpers.ts` (repo state helpers). Made esbuild-web.js concatenation order deterministic. GitGraphView class remains in main.ts for further extraction. |
 | 2026-02-06 | **Phase 2 Complete**: Reduced activation from `*` to `onStartupFinished` for deferred loading. Migrated backend build from tsc to esbuild (3 bundled entry points in ~26ms). Replaced UglifyJS with esbuild transform for webview minification. Removed unnecessary `original-fs` patching. Added source maps for backend debugging. Removed `uglify-js` devDependency. Added `typecheck` script for standalone type checking. |
 | 2026-02-06 | **Wrap up Phase 1 tech debt**: Updated CI to use `--frozen-lockfile`, added `pnpm audit --audit-level high` step, upgraded `actions/checkout` to v4. Removed resolved debt items (no lockfile, ancient deps). All Phase 1 tasks now ✅. |
