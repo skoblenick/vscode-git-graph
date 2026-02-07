@@ -1525,21 +1525,29 @@
 		"package": "vsce package",
 		"package-and-install": "pnpm run package && node ./.vscode/install-package.js",
 		"test": "jest --verbose",
-		"test-and-report-coverage": "jest --verbose --coverage"
+		"test-and-report-coverage": "jest --verbose --coverage",
+		"compile:integration-tests": "tsc -p integration-tests/tsconfig.json",
+		"test:integration": "pnpm run compile && pnpm run compile:integration-tests && node ./out/integration-tests/runTests.js",
+		"test:webview": "pnpm run compile && pnpm exec playwright test -c webview-tests/playwright.config.ts"
 	},
 	"dependencies": {
 		"iconv-lite": "0.6.3"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.58.2",
 		"@types/jest": "29.5.14",
 		"@types/node": "25.2.1",
 		"@types/vscode": "1.70.0",
 		"@typescript-eslint/eslint-plugin": "8.54.0",
 		"@typescript-eslint/parser": "8.54.0",
+		"@vscode/test-electron": "^2.5.2",
 		"esbuild": "^0.27.3",
 		"eslint": "8.57.1",
+		"glob": "^13.0.1",
 		"jest": "29.7.0",
+		"jest-cli": "29",
 		"jest-environment-jsdom": "^30.2.0",
+		"mocha": "^11.7.5",
 		"ts-jest": "29.4.6",
 		"typescript": "5.9.3"
 	}

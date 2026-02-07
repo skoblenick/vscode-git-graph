@@ -25,3 +25,11 @@ jobs:
     - run: pnpm audit --audit-level high
     - run: pnpm run compile
     - run: pnpm run test
+    - name: Compile integration tests
+      run: pnpm run compile:integration-tests
+    - name: VS Code integration tests
+      run: xvfb-run -a pnpm run test:integration
+    - name: Install Playwright browsers
+      run: pnpm exec playwright install --with-deps chromium
+    - name: Webview UI tests
+      run: xvfb-run -a pnpm run test:webview

@@ -104,14 +104,14 @@ Goal: Resolve remaining technical debt and improve performance, privacy, and rel
 
 ---
 
-## Phase 6: E2E / Integration Testing (Priority: Optional, Deferred)
+## Phase 6: E2E / Integration Testing (Priority: Optional, Deferred) — ✅ Complete
 
 Goal: Add end-to-end and integration tests that exercise the full VS Code runtime.
 
-| Task                          | Status | Notes                                                                                                           |
-| ----------------------------- | ------ | --------------------------------------------------------------------------------------------------------------- |
-| Add VS Code integration tests | ⬜     | Use `@vscode/test-electron` + `xvfb-run` in CI; smoke-test activation, command registration, webview panel open |
-| Add webview browser tests     | ⬜     | Requires Playwright/Puppeteer; consider driving VS Code itself for realism rather than standalone browser       |
+| Task                          | Status | Notes                                                                                                                                                                                                   |
+| ----------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add VS Code integration tests | ✅     | `@vscode/test-electron` + Jest (via `jest-cli`) + `xvfb-run` in CI. 4 smoke tests: extension present, activation, 10 command registrations, webview panel open. Separate `integration-tests/` directory |
+| Add webview browser tests     | ✅     | Playwright Electron drives VS Code itself for realism. Launches VS Code, opens command palette, asserts Git Graph tab renders. Separate `webview-tests/` directory                                      |
 
 ---
 
@@ -146,6 +146,7 @@ Goal: Add end-to-end and integration tests that exercise the full VS Code runtim
 
 | Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-02-07 | **Phase 6 Complete**: Added VS Code integration tests (`@vscode/test-electron` + Jest via `jest-cli`, 4 smoke tests: extension present, activation, 10 command registrations, webview panel open). Added Playwright Electron webview browser test (drives VS Code, opens Git Graph via command palette, asserts tab renders). CI updated with `xvfb-run` for headless Linux. New devDependencies: `@vscode/test-electron`, `jest-cli@29`, `@playwright/test`, `glob`. |
 | 2026-02-07 | **Phase 5 Complete**: Smart repo refresh (5 narrow `.git/*` watchers via RelativePattern, cross-platform path handling, 12 new tests). Removed all external lifecycle telemetry for privacy compliance. Avatar rate-limit resilience (email-only queue dedupe, MAX_AVATAR_ATTEMPTS=5, content-type validation, proper 403/429 backoff). Deprecated settings migration (29 old→new key mappings, idempotent, 8 new tests). 1638 tests across 29 suites. |
 | 2026-02-06 | **Phase 5 Planned**: Added 4 tasks — Smart repo refresh (Git-aware watching), Telemetry consent & compliance, Avatar rate-limit resilience, Deprecated settings cleanup. Cross-referenced Technical Debt Inventory items to Phase 5 tasks.                                                                                                                                                                                      |
 | 2026-02-06 | **Phase 4 Wrapped Up**: Declared Phase 4 complete — all unit/VM testing improvements done (1634 tests, 28 suites). Moved blocked E2E items (integration tests, browser tests) to new Phase 6 as optional deferred work.                                                                                                                                                                                                         |

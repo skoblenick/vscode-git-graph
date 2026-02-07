@@ -7,6 +7,8 @@ out/*.d.ts
 resources/demo.gif
 src/
 tests/
+integration-tests/
+webview-tests/
 web/
 .eslintrc.json
 .gitignore
