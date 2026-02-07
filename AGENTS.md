@@ -69,7 +69,7 @@ All tasks done: Node 20, TypeScript 5.9, ESLint 8, Jest 29, vscode engine 1.70, 
 All tasks done: Activation reduced to `onStartupFinished`, esbuild for backend + webview minification, original-fs patching removed, source maps added.
 
 ### Phase 3: Webview Refactor — ✅ Complete
-All tasks done: State persistence, message handlers, context menus, CDV, renderers, helpers extracted. 115 webview tests added. main.ts reduced from 3964 to 1436 lines.
+All tasks done: State persistence, message handlers, context menus, CDV, renderers, helpers extracted. 198 webview tests added across 9 test files. main.ts reduced from 3964 to 1436 lines.
 
 ## Code Conventions
 

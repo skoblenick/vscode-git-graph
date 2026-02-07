@@ -70,7 +70,7 @@ Goal: Break up `web/main.ts` monolith for maintainability.
 | Extract commit details view | ✅ | Extracted to `web/commitDetailsView.ts` (654 lines) — CDV rendering, resizing, file interaction, code review, divider dragging |
 | Extract renderers | ✅ | Extracted to `web/tableRenderer.ts` (402 lines) — renderView, renderGraphView, renderTableView, renderUncommittedChanges, renderFetchButton, renderRefreshButton, renderTagDetails, renderRepoDropdownOptions, makeTableResizable, getColumnVisibility, getNumColumns |
 | Consider lightweight framework | ❌ | Staying vanilla DOM — no framework needed for this refactor |
-| Add webview tests | ✅ | 115 tests across 5 test files — repoStateHelpers, miscHelpers, statePersistence, tableRenderer, webUtils. Uses VM sandbox with jsdom to test `module: none` code |
+| Add webview tests | ✅ | 198 tests across 9 test files — repoStateHelpers, miscHelpers, statePersistence, tableRenderer, webUtils, fileTree, messageHandler, contextMenuActions, commitDetailsView. Uses VM sandbox with jsdom to test `module: none` code |
 | Extract helper functions | ✅ | Extracted `web/fileTree.ts`, `web/repoStateHelpers.ts`, `web/miscHelpers.ts` — file tree, repo state, and misc helpers |
 | Deterministic build ordering | ✅ | `esbuild-web.js` now sorts middle JS files alphabetically |
 

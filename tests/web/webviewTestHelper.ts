@@ -16,6 +16,10 @@ const GG_ENUMS: Record<string, any> = {
 	RepoCommitOrdering: { Default: 'default', Date: 'date', AuthorDate: 'author-date', Topological: 'topo' },
 	RepoDropdownOrder: { FullPath: 0, Name: 1, WorkspaceFullPath: 2 },
 	TagType: { Annotated: 0, Lightweight: 1 },
+	MergeActionOn: { Branch: 'Branch', RemoteTrackingBranch: 'Remote-tracking Branch', Commit: 'Commit' },
+	RebaseActionOn: { Branch: 'Branch', Commit: 'Commit' },
+	GitPushBranchMode: { Normal: '', Force: 'force', ForceWithLease: 'force-with-lease' },
+	GitResetMode: { Soft: 'soft', Mixed: 'mixed', Hard: 'hard' },
 };
 
 export function createWebContext() {
