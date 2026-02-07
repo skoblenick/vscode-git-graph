@@ -216,3 +216,33 @@ function getChildByPathSegment(folder: FileTreeFolder, pathSeg: string) {
 	}
 	return cur;
 }
+
+function createFileTree(currentRepo: string, gitRepos: GG.GitRepoSet, gitFiles: ReadonlyArray<GG.GitFileChange>, codeReview: GG.CodeReview | null) {
+	let contents: FileTreeFolderContents = {}, i, j, path, absPath, cur: FileTreeFolder;
+	let files: FileTreeFolder = { type: 'folder', name: '', folderPath: '', contents: contents, open: true, reviewed: true };
+
+	for (i = 0; i < gitFiles.length; i++) {
+		cur = files;
+		path = gitFiles[i].newFilePath.split('/');
+		absPath = currentRepo;
+		for (j = 0; j < path.length; j++) {
+			absPath += '/' + path[j];
+			if (typeof gitRepos[absPath] !== 'undefined') {
+				if (typeof cur.contents[path[j]] === 'undefined') {
+					cur.contents[path[j]] = { type: 'repo', name: path[j], path: absPath };
+				}
+				break;
+			} else if (j < path.length - 1) {
+				if (typeof cur.contents[path[j]] === 'undefined') {
+					contents = {};
+					cur.contents[path[j]] = { type: 'folder', name: path[j], folderPath: absPath.substring(currentRepo.length + 1), contents: contents, open: true, reviewed: true };
+				}
+				cur = <FileTreeFolder>cur.contents[path[j]];
+			} else if (path[j] !== '') {
+				cur.contents[path[j]] = { type: 'file', name: path[j], index: i, reviewed: codeReview === null || !codeReview.remainingFiles.includes(gitFiles[i].newFilePath) };
+			}
+		}
+	}
+	if (codeReview !== null) calcFileTreeFoldersReviewed(files);
+	return files;
+}

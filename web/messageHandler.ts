@@ -126,7 +126,7 @@ function handleMessage(gitGraph: GitGraphView, imageResizer: ImageResizer, msg: 
 			break;
 		case 'commitDetails':
 			if (msg.commitDetails !== null) {
-				gitGraph.showCommitDetails(msg.commitDetails, gitGraph.createFileTree(msg.commitDetails.fileChanges, msg.codeReview), msg.avatar, msg.codeReview, msg.codeReview !== null ? msg.codeReview.lastViewedFile : null, msg.refresh);
+				gitGraph.showCommitDetails(msg.commitDetails, createFileTree(gitGraph.getCurrentRepo(), gitGraph.getGitRepos(), msg.commitDetails.fileChanges, msg.codeReview), msg.avatar, msg.codeReview, msg.codeReview !== null ? msg.codeReview.lastViewedFile : null, msg.refresh);
 			} else {
 				gitGraph.closeCommitDetails(true);
 				dialog.showError('Unable to load Commit Details', msg.error, null, null);
@@ -134,7 +134,7 @@ function handleMessage(gitGraph: GitGraphView, imageResizer: ImageResizer, msg: 
 			break;
 		case 'compareCommits':
 			if (msg.error === null) {
-				gitGraph.showCommitComparison(msg.commitHash, msg.compareWithHash, msg.fileChanges, gitGraph.createFileTree(msg.fileChanges, msg.codeReview), msg.codeReview, msg.codeReview !== null ? msg.codeReview.lastViewedFile : null, msg.refresh);
+				gitGraph.showCommitComparison(msg.commitHash, msg.compareWithHash, msg.fileChanges, createFileTree(gitGraph.getCurrentRepo(), gitGraph.getGitRepos(), msg.fileChanges, msg.codeReview), msg.codeReview, msg.codeReview !== null ? msg.codeReview.lastViewedFile : null, msg.refresh);
 			} else {
 				gitGraph.closeCommitComparison(true);
 				dialog.showError('Unable to load Commit Comparison', msg.error, null, null);

@@ -76,13 +76,18 @@ Goal: Break up `web/main.ts` monolith for maintainability.
 
 ---
 
-## Phase 4: Testing Improvements (Priority: Low)
+## Phase 4: Testing Improvements (Priority: Low) — ✅ Complete
+
+Unit + VM/jsdom coverage complete (1634 tests, 28 suites). E2E tests deferred to Phase 6.
 
 | Task | Status | Notes |
 |------|--------|-------|
-| Add integration tests | ⬜ | `@vscode/test-electron` |
-| Improve coverage | ⬜ | `askpass/`, `life-cycle/` untested |
-| Add webview browser tests | ⬜ | Playwright/Puppeteer |
+| Improve coverage | ✅ | Added 34 tests: `askpassManager.test.ts` (10), `life-cycle-utils.test.ts` (14), `startup.test.ts` (6), `uninstall.test.ts` (4) |
+| Extract `createFileTree` from main.ts | ✅ | Extracted to standalone `createFileTree()` in `web/fileTree.ts`; main.ts delegates to it; messageHandler calls it directly; 7 new tests |
+| Sort CSS file ordering in build | ✅ | `esbuild-web.js` now sorts extra CSS files alphabetically (matching JS sort) |
+| Fix `"use strict"` stripping | ✅ | Changed literal `'"use strict";\r\n'` to regex `/^"use strict";\r?\n/` — handles both LF and CRLF |
+| Deepen webview render test coverage | ✅ | Added 28 tests: `renderTableView` (12), `renderGraphView` (3), `renderView` (1), `renderCommitDetailsView` (11) + 1 closeCdvContextMenuIfOpen |
+| Deepen messageHandler test coverage | ✅ | All 42 switch cases now tested — 118 total tests (up from 30); includes special PushTagCommitNotOnRemote paths and force-delete callback |
 
 ---
 
@@ -93,6 +98,17 @@ Track new features here as they're planned.
 | Feature | Status | Notes |
 |---------|--------|-------|
 | (none planned yet) | | |
+
+---
+
+## Phase 6: E2E / Integration Testing (Priority: Optional, Deferred)
+
+Goal: Add end-to-end and integration tests that exercise the full VS Code runtime.
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Add VS Code integration tests | ⬜ | Use `@vscode/test-electron` + `xvfb-run` in CI; smoke-test activation, command registration, webview panel open |
+| Add webview browser tests | ⬜ | Requires Playwright/Puppeteer; consider driving VS Code itself for realism rather than standalone browser |
 
 ---
 
@@ -127,6 +143,8 @@ Track new features here as they're planned.
 
 | Date | Change |
 |------|--------|
+| 2026-02-06 | **Phase 4 Wrapped Up**: Declared Phase 4 complete — all unit/VM testing improvements done (1634 tests, 28 suites). Moved blocked E2E items (integration tests, browser tests) to new Phase 6 as optional deferred work. |
+| 2026-02-06 | **Phase 4 Complete**: Extracted `createFileTree` to `web/fileTree.ts` as standalone function. Fixed `esbuild-web.js` CSS sort ordering and `"use strict"` stripping regex. Added 34 backend tests for `askpass/` and `life-cycle/` modules. Deepened webview render tests (28 new) and messageHandler tests (88 new, 118 total). Marked integration tests and browser tests as blocked. Test count: 1634 across 28 suites. |
 | 2026-02-06 | **Phase 3 Complete**: Extracted state persistence to `web/statePersistence.ts` (105 lines) and renderers to `web/tableRenderer.ts` (402 lines). Added 115 webview unit tests across 5 files using VM sandbox + jsdom to test `module: none` code. main.ts now 1436 lines (down from 3964). All Phase 3 tasks ✅. |
 | 2026-02-06 | **Phase 3 Progress — CDV Extraction**: Extracted commit details view from `web/main.ts` into `web/commitDetailsView.ts` (654 lines). Includes renderCommitDetailsView, CDV resizing/divider, file view interaction, code review, closeCdvContextMenuIfOpen. main.ts now 1847 lines (down from 2484). Made isCdvDocked public. |
 | 2026-02-06 | **Phase 3 Progress — Context Menu Extraction**: Extracted context menu actions from `web/main.ts` into `web/contextMenuActions.ts` (769 lines). main.ts went from 3195→2484 lines. Added public getters on GitGraphView. |

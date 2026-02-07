@@ -318,6 +318,71 @@ describe('fileTree', () => {
 		});
 	});
 
+	describe('createFileTree', () => {
+		it('should create empty tree for empty file list', () => {
+			const result = vm.runInContext(`createFileTree('/repo', {}, [], null)`, ctx);
+			expect(result.type).toBe('folder');
+			expect(result.contents).toEqual({});
+		});
+
+		it('should create tree with files', () => {
+			const result = vm.runInContext(`
+				var files = [
+					{ oldFilePath: 'src/a.ts', newFilePath: 'src/a.ts', type: 'M', additions: 1, deletions: 0 },
+					{ oldFilePath: 'b.ts', newFilePath: 'b.ts', type: 'A', additions: 5, deletions: 0 }
+				];
+				createFileTree('/repo', {}, files, null);
+			`, ctx);
+			expect(result.contents['src'].type).toBe('folder');
+			expect(result.contents['src'].contents['a.ts'].type).toBe('file');
+			expect(result.contents['src'].contents['a.ts'].index).toBe(0);
+			expect(result.contents['b.ts'].type).toBe('file');
+			expect(result.contents['b.ts'].index).toBe(1);
+		});
+
+		it('should mark files as reviewed when no code review', () => {
+			const result = vm.runInContext(`
+				var files2 = [{ oldFilePath: 'a.ts', newFilePath: 'a.ts', type: 'M', additions: 1, deletions: 0 }];
+				createFileTree('/repo', {}, files2, null);
+			`, ctx);
+			expect(result.contents['a.ts'].reviewed).toBe(true);
+		});
+
+		it('should mark files as unreviewed when in code review remaining files', () => {
+			const result = vm.runInContext(`
+				var files3 = [{ oldFilePath: 'a.ts', newFilePath: 'a.ts', type: 'M', additions: 1, deletions: 0 }];
+				createFileTree('/repo', {}, files3, { remainingFiles: ['a.ts'] });
+			`, ctx);
+			expect(result.contents['a.ts'].reviewed).toBe(false);
+		});
+
+		it('should detect nested repos', () => {
+			const result = vm.runInContext(`
+				var files4 = [{ oldFilePath: 'sub/file.ts', newFilePath: 'sub/file.ts', type: 'A', additions: 1, deletions: 0 }];
+				createFileTree('/repo', { '/repo/sub': {} }, files4, null);
+			`, ctx);
+			expect(result.contents['sub'].type).toBe('repo');
+			expect(result.contents['sub'].path).toBe('/repo/sub');
+		});
+
+		it('should skip empty path segments', () => {
+			const result = vm.runInContext(`
+				var files5 = [{ oldFilePath: '', newFilePath: '', type: 'A', additions: 1, deletions: 0 }];
+				createFileTree('/repo', {}, files5, null);
+			`, ctx);
+			expect(Object.keys(result.contents).length).toBe(0);
+		});
+
+		it('should set correct folderPath for nested folders', () => {
+			const result = vm.runInContext(`
+				var files6 = [{ oldFilePath: 'src/lib/file.ts', newFilePath: 'src/lib/file.ts', type: 'M', additions: 1, deletions: 0 }];
+				createFileTree('/repo', {}, files6, null);
+			`, ctx);
+			expect(result.contents['src'].folderPath).toBe('src');
+			expect(result.contents['src'].contents['lib'].folderPath).toBe('src/lib');
+		});
+	});
+
 	describe('generateFileViewHtml', () => {
 		it('should return HTML string for tree view type', () => {
 			const result = vm.runInContext(`

@@ -29,11 +29,10 @@ let packageJsFiles = [
 ];
 
 let packageCssFiles = [path.join(STYLES_DIRECTORY, MAIN_CSS_FILE)];
-fs.readdirSync(STYLES_DIRECTORY).forEach((fileName) => {
-	if (fileName.endsWith('.css') && fileName !== MAIN_CSS_FILE) {
-		packageCssFiles.push(path.join(STYLES_DIRECTORY, fileName));
-	}
-});
+const extraCssFiles = fs.readdirSync(STYLES_DIRECTORY)
+	.filter(f => f.endsWith('.css') && f !== MAIN_CSS_FILE)
+	.sort((a, b) => a.localeCompare(b));
+packageCssFiles.push(...extraCssFiles.map(f => path.join(STYLES_DIRECTORY, f)));
 
 console.log('Packaging Mode = ' + (DEBUG ? 'DEBUG' : 'PRODUCTION'));
 console.log('Packaging CSS files: ' + packageCssFiles.join(', '));
@@ -42,7 +41,7 @@ console.log('Packaging JS files: ' + packageJsFiles.join(', '));
 async function build() {
 	let jsFileContents = '';
 	packageJsFiles.forEach((fileName) => {
-		jsFileContents += fs.readFileSync(fileName).toString().replace('"use strict";\r\n', '') + '\r\n';
+		jsFileContents += fs.readFileSync(fileName).toString().replace(/^"use strict";\r?\n/, '') + '\r\n';
 		fs.unlinkSync(fileName);
 	});
 	const wrappedJs = '"use strict";\r\n(function(document, window){\r\n' + jsFileContents + '})(document, window);\r\n';
