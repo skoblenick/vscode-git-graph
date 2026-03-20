@@ -1,0 +1,27 @@
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - task -l
+
+  build:
+    cmds:
+      - pnpm compile
+
+  check:
+    cmds:
+      - pnpm lint
+      - pnpm fmt:check
+
+  lint:
+    cmds:
+      - pnpm lint
+
+  fmt:
+    cmds:
+      - pnpm fmt
+
+  test:
+    cmds:
+      - pnpm test

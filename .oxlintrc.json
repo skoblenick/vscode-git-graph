@@ -1,0 +1,54 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript"],
+	"rules": {
+		"eqeqeq": "warn",
+		"no-alert": "error",
+		"no-console": "error",
+		"no-eval": "error",
+		"no-extra-boolean-cast": "warn",
+		"no-implied-eval": "error",
+		"no-irregular-whitespace": "warn",
+		"no-labels": "error",
+		"no-proto": "error",
+		"no-prototype-builtins": "error",
+		"no-redeclare": "error",
+		"no-global-assign": "error",
+		"no-shadow-restricted-names": "error",
+		"no-script-url": "error",
+		"no-sparse-arrays": "warn",
+		"no-throw-literal": "warn",
+		"no-unneeded-ternary": "warn",
+		"no-unsafe-negation": "warn",
+		"no-unused-expressions": "warn",
+		"no-var": "warn",
+		"no-with": "error",
+		"new-cap": "warn",
+		"sort-imports": ["warn", {
+			"allowSeparatedGroups": true,
+			"ignoreDeclarationSort": true
+		}],
+		"yoda": "warn",
+
+		"typescript/await-thenable": "warn",
+		"typescript/ban-ts-comment": "error",
+		"typescript/class-literal-property-style": ["warn", "fields"],
+		"typescript/no-misused-new": "warn",
+		"typescript/no-this-alias": "warn",
+		"typescript/no-unnecessary-boolean-literal-compare": "warn"
+	},
+	"overrides": [
+		{
+			"files": ["src/askpass/*.ts"],
+			"rules": {
+				"no-console": "off"
+			}
+		},
+		{
+			"files": ["tests/mocks/*.ts"],
+			"rules": {
+				"no-global-assign": "off"
+			}
+		}
+	]
+}

@@ -14,137 +14,162 @@ let onDidChangeConfiguration: EventEmitter<ConfigurationChangeEvent>;
 let logger: Logger;
 
 beforeAll(() => {
-	onDidChangeRepos = new EventEmitter<RepoChangeEvent>();
-	onDidChangeConfiguration = new EventEmitter<ConfigurationChangeEvent>();
-	logger = new Logger();
+  onDidChangeRepos = new EventEmitter<RepoChangeEvent>();
+  onDidChangeConfiguration = new EventEmitter<ConfigurationChangeEvent>();
+  logger = new Logger();
 });
 
 afterAll(() => {
-	logger.dispose();
+  logger.dispose();
 });
 
 describe('StatusBarItem', () => {
-	it('Should show the Status Bar Item on vscode startup', () => {
-		// Setup
-		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
+  it('Should show the Status Bar Item on vscode startup', () => {
+    // Setup
+    vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
-		// Run
-		const statusBarItem = new StatusBarItem(1, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+    // Run
+    const statusBarItem = new StatusBarItem(
+      1,
+      onDidChangeRepos.subscribe,
+      onDidChangeConfiguration.subscribe,
+      logger
+    );
 
-		// Assert
-		expect(vscodeStatusBarItem.text).toBe('Git Graph');
-		expect(vscodeStatusBarItem.tooltip).toBe('View Git Graph');
-		expect(vscodeStatusBarItem.command).toBe('git-graph.view');
-		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
-		expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
+    // Assert
+    expect(vscodeStatusBarItem.text).toBe('Git Graph');
+    expect(vscodeStatusBarItem.tooltip).toBe('View Git Graph');
+    expect(vscodeStatusBarItem.command).toBe('git-graph.view');
+    expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
+    expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
 
-		// Teardown
-		statusBarItem.dispose();
+    // Teardown
+    statusBarItem.dispose();
 
-		// Asset
-		expect(vscodeStatusBarItem.dispose).toHaveBeenCalledTimes(1);
-		expect(onDidChangeRepos['listeners']).toHaveLength(0);
-		expect(onDidChangeConfiguration['listeners']).toHaveLength(0);
-	});
+    // Asset
+    expect(vscodeStatusBarItem.dispose).toHaveBeenCalledTimes(1);
+    expect(onDidChangeRepos['listeners']).toHaveLength(0);
+    expect(onDidChangeConfiguration['listeners']).toHaveLength(0);
+  });
 
-	it('Should hide the Status Bar Item after the number of repositories becomes zero', () => {
-		// Setup
-		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
+  it('Should hide the Status Bar Item after the number of repositories becomes zero', () => {
+    // Setup
+    vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
-		// Run
-		const statusBarItem = new StatusBarItem(1, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+    // Run
+    const statusBarItem = new StatusBarItem(
+      1,
+      onDidChangeRepos.subscribe,
+      onDidChangeConfiguration.subscribe,
+      logger
+    );
 
-		// Assert
-		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
-		expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
+    // Assert
+    expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
+    expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
 
-		// Run
-		onDidChangeRepos.emit({
-			repos: {},
-			numRepos: 0,
-			loadRepo: null
-		});
+    // Run
+    onDidChangeRepos.emit({
+      repos: {},
+      numRepos: 0,
+      loadRepo: null
+    });
 
-		// Assert
-		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
-		expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(1);
+    // Assert
+    expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
+    expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(1);
 
-		// Teardown
-		statusBarItem.dispose();
-	});
+    // Teardown
+    statusBarItem.dispose();
+  });
 
-	it('Should show the Status Bar Item after the number of repositories increases above zero', () => {
-		// Setup
-		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
+  it('Should show the Status Bar Item after the number of repositories increases above zero', () => {
+    // Setup
+    vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
-		// Run
-		const statusBarItem = new StatusBarItem(0, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+    // Run
+    const statusBarItem = new StatusBarItem(
+      0,
+      onDidChangeRepos.subscribe,
+      onDidChangeConfiguration.subscribe,
+      logger
+    );
 
-		// Assert
-		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(0);
-		expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
+    // Assert
+    expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(0);
+    expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
 
-		// Run
-		onDidChangeRepos.emit({
-			repos: {},
-			numRepos: 1,
-			loadRepo: null
-		});
+    // Run
+    onDidChangeRepos.emit({
+      repos: {},
+      numRepos: 1,
+      loadRepo: null
+    });
 
-		// Assert
-		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
-		expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
+    // Assert
+    expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
+    expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
 
-		// Teardown
-		statusBarItem.dispose();
-	});
+    // Teardown
+    statusBarItem.dispose();
+  });
 
-	it('Should hide the Status Bar Item the extension setting git-graph.showStatusBarItem becomes disabled', () => {
-		// Setup
-		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
+  it('Should hide the Status Bar Item the extension setting git-graph.showStatusBarItem becomes disabled', () => {
+    // Setup
+    vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
-		// Run
-		const statusBarItem = new StatusBarItem(1, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+    // Run
+    const statusBarItem = new StatusBarItem(
+      1,
+      onDidChangeRepos.subscribe,
+      onDidChangeConfiguration.subscribe,
+      logger
+    );
 
-		// Assert
-		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
-		expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
+    // Assert
+    expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
+    expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
 
-		// Run
-		vscode.mockExtensionSettingReturnValue('showStatusBarItem', false);
-		onDidChangeConfiguration.emit({
-			affectsConfiguration: () => true
-		});
+    // Run
+    vscode.mockExtensionSettingReturnValue('showStatusBarItem', false);
+    onDidChangeConfiguration.emit({
+      affectsConfiguration: () => true
+    });
 
-		// Assert
-		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
-		expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(1);
+    // Assert
+    expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
+    expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(1);
 
-		// Teardown
-		statusBarItem.dispose();
-	});
+    // Teardown
+    statusBarItem.dispose();
+  });
 
-	it('Should ignore extension setting changes unrelated to git-graph.showStatusBarItem', () => {
-		// Setup
-		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
+  it('Should ignore extension setting changes unrelated to git-graph.showStatusBarItem', () => {
+    // Setup
+    vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
-		// Run
-		const statusBarItem = new StatusBarItem(1, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+    // Run
+    const statusBarItem = new StatusBarItem(
+      1,
+      onDidChangeRepos.subscribe,
+      onDidChangeConfiguration.subscribe,
+      logger
+    );
 
-		// Assert
-		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
-		expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
+    // Assert
+    expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
+    expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
 
-		// Run
-		onDidChangeConfiguration.emit({
-			affectsConfiguration: () => false
-		});
+    // Run
+    onDidChangeConfiguration.emit({
+      affectsConfiguration: () => false
+    });
 
-		// Assert
-		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
-		expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
+    // Assert
+    expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
+    expect(vscodeStatusBarItem.hide).toHaveBeenCalledTimes(0);
 
-		// Teardown
-		statusBarItem.dispose();
-	});
+    // Teardown
+    statusBarItem.dispose();
+  });
 });

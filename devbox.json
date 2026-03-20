@@ -1,12 +1,11 @@
 {
-  "packages": [
-    "nodejs@20",
-    "git@latest"
-  ],
+  "packages": {
+    "nodejs": { "version": "24" },
+    "git": { "version": "latest" },
+    "go-task": { "version": "latest" }
+  },
   "shell": {
-    "init_hook": [
-      "echo 'vscode-git-graph devbox environment loaded (Node 20 + pnpm via corepack)'"
-    ],
+    "init_hook": ["echo 'vscode-git-graph devbox environment'"],
     "scripts": {
       "build": "pnpm compile",
       "test": "pnpm test",

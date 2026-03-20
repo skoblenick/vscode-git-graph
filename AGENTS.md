@@ -8,9 +8,12 @@ This is a VS Code extension for visualizing Git history as a graph. This fork is
 # Via devbox (recommended):
 devbox shell          # Enter devbox environment
 pnpm install          # Install dependencies
-pnpm compile          # Full build (lint → clean → compile-src → compile-web)
+pnpm compile          # Full build (oxlint → oxfmt check → clean → compile-src → compile-web)
 pnpm compile-src      # Backend only (src/ → out/)
 pnpm compile-web      # Frontend only (web/ → media/)
+pnpm lint             # Run oxlint
+pnpm fmt              # Format with oxfmt
+pnpm fmt:check        # Check formatting
 pnpm test             # Run Jest tests
 pnpm package          # Create .vsix package
 
