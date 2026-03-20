@@ -227,27 +227,24 @@ export class RepoManager extends Disposable {
    * @param path The path of the repository.
    * @param loadRepo If TRUE and the Git Graph View is visible, load the Git Graph View with the repository being registered.
    */
-  public registerRepo(path: string, loadRepo: boolean) {
-    return new Promise<{ root: string | null; error: string | null }>(async (resolve) => {
-      let root = await this.dataSource.repoRoot(path);
-      if (root === null) {
-        resolve({ root: null, error: 'The folder "' + path + '" is not a Git repository.' });
-      } else if (typeof this.repos[root] !== 'undefined') {
-        resolve({
-          root: null,
-          error:
-            'The folder "' + path + '" is contained within the known repository "' + root + '".'
-        });
-      } else {
-        if (this.ignoredRepos.includes(root)) {
-          this.ignoredRepos.splice(this.ignoredRepos.indexOf(root), 1);
-          this.extensionState.setIgnoredRepos(this.ignoredRepos);
-        }
-        await this.addRepo(root);
-        this.sendRepos(loadRepo ? root : null);
-        resolve({ root: root, error: null });
+  public async registerRepo(path: string, loadRepo: boolean) {
+    const root = await this.dataSource.repoRoot(path);
+    if (root === null) {
+      return { root: null, error: 'The folder "' + path + '" is not a Git repository.' };
+    } else if (typeof this.repos[root] !== 'undefined') {
+      return {
+        root: null,
+        error: 'The folder "' + path + '" is contained within the known repository "' + root + '".'
+      };
+    } else {
+      if (this.ignoredRepos.includes(root)) {
+        this.ignoredRepos.splice(this.ignoredRepos.indexOf(root), 1);
+        this.extensionState.setIgnoredRepos(this.ignoredRepos);
       }
-    });
+      await this.addRepo(root);
+      this.sendRepos(loadRepo ? root : null);
+      return { root: root, error: null };
+    }
   }
 
   /**
@@ -767,7 +764,7 @@ export class RepoManager extends Disposable {
           );
         }
       }
-    } catch (_) {}
+    } catch {}
     return false;
   }
 
@@ -916,7 +913,7 @@ function readExternalConfigFile(repo: string) {
         try {
           const contents = JSON.parse(data.toString());
           resolve(typeof contents === 'object' ? contents : null);
-        } catch (_) {
+        } catch {
           resolve(null);
         }
       }

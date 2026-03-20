@@ -1,7 +1,9 @@
+import type { MockInstance } from 'vitest';
+
 type OnCallbacks = { [event: string]: (...args: any[]) => void };
 
 export function mockSpyOnSpawn(
-  spyOnSpawn: jest.SpyInstance,
+  spyOnSpawn: MockInstance,
   callback: (
     onCallbacks: OnCallbacks,
     stderrOnCallbacks: OnCallbacks,

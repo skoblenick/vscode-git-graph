@@ -1,35 +1,36 @@
 import * as vscode from './mocks/vscode';
-jest.mock('vscode', () => vscode, { virtual: true });
 
 import * as http from 'http';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-jest.mock('http');
-jest.mock('fs');
+vi.mock('http');
+vi.mock('fs');
 
-const mockGetNonce = jest.fn();
-jest.mock('../src/utils', () => ({
+const { mockGetNonce } = vi.hoisted(() => ({
+  mockGetNonce: vi.fn()
+}));
+vi.mock('../src/utils', () => ({
   getNonce: mockGetNonce
 }));
 
 import { AskpassManager } from '../src/askpass/askpassManager';
 
-const mockedHttp = jest.mocked(http);
-const mockedFs = jest.mocked(fs);
+const mockedHttp = vi.mocked(http);
+const mockedFs = vi.mocked(fs);
 
 let mockServer: {
-  listen: jest.Mock;
-  on: jest.Mock;
-  close: jest.Mock;
+  listen: Mock;
+  on: Mock;
+  close: Mock;
 };
 
 beforeEach(() => {
   mockServer = {
-    listen: jest.fn(),
-    on: jest.fn(),
-    close: jest.fn()
+    listen: vi.fn(),
+    on: vi.fn(),
+    close: vi.fn()
   };
   mockedHttp.createServer.mockReturnValue(mockServer as any);
   mockedFs.chmod.mockImplementation((_path: any, _mode: any, callback: any) => {
@@ -200,23 +201,23 @@ describe('AskpassManager', () => {
 
   describe('onRequest', () => {
     it('Should handle a request and show input box', async () => {
-      const requestHandler = jest.fn();
+      const requestHandler = vi.fn();
       mockedHttp.createServer.mockImplementation((handler: any) => {
         requestHandler.mockImplementation(handler);
         return mockServer as any;
       });
 
-      (vscode.window as any).showInputBox = jest.fn().mockResolvedValue('mypassword');
+      (vscode.window as any).showInputBox = vi.fn().mockResolvedValue('mypassword');
 
       const manager = new AskpassManager();
 
       const mockReq: any = {
-        setEncoding: jest.fn(),
-        on: jest.fn()
+        setEncoding: vi.fn(),
+        on: vi.fn()
       };
       const mockRes: any = {
-        writeHead: jest.fn(),
-        end: jest.fn()
+        writeHead: vi.fn(),
+        end: vi.fn()
       };
 
       requestHandler(mockReq, mockRes);
@@ -243,23 +244,23 @@ describe('AskpassManager', () => {
     });
 
     it('Should respond with 500 when input box is rejected', async () => {
-      const requestHandler = jest.fn();
+      const requestHandler = vi.fn();
       mockedHttp.createServer.mockImplementation((handler: any) => {
         requestHandler.mockImplementation(handler);
         return mockServer as any;
       });
 
-      (vscode.window as any).showInputBox = jest.fn().mockRejectedValue(new Error('dismissed'));
+      (vscode.window as any).showInputBox = vi.fn().mockRejectedValue(new Error('dismissed'));
 
       const manager = new AskpassManager();
 
       const mockReq: any = {
-        setEncoding: jest.fn(),
-        on: jest.fn()
+        setEncoding: vi.fn(),
+        on: vi.fn()
       };
       const mockRes: any = {
-        writeHead: jest.fn(),
-        end: jest.fn()
+        writeHead: vi.fn(),
+        end: vi.fn()
       };
 
       requestHandler(mockReq, mockRes);

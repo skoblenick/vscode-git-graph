@@ -39,7 +39,7 @@ export class AskpassManager extends Disposable {
     try {
       this.server.listen(this.ipcHandlePath);
       this.server.on('error', () => {});
-    } catch (err) {
+    } catch {
       this.enabled = false;
     }
     fs.chmod(path.join(__dirname, 'askpass.sh'), '755', () => {});
@@ -53,7 +53,7 @@ export class AskpassManager extends Disposable {
           if (process.platform !== 'win32') {
             fs.unlinkSync(this.ipcHandlePath);
           }
-        } catch (e) {}
+        } catch {}
       })
     );
   }

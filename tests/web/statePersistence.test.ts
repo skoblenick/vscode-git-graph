@@ -1,4 +1,4 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 import * as vm from 'vm';
 import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
@@ -60,13 +60,11 @@ function createMockView(ctx: vm.Context, overrides: Record<string, any> = {}) {
 
 describe('statePersistence', () => {
   let ctx: vm.Context;
-  let sandbox: Record<string, any>;
-  let vsCodeApi: { getState: jest.Mock; postMessage: jest.Mock; setState: jest.Mock };
+  let vsCodeApi: { getState: Mock; postMessage: Mock; setState: Mock };
 
   beforeEach(() => {
     const webCtx = createWebContext();
     ctx = webCtx.ctx;
-    sandbox = webCtx.sandbox;
     vsCodeApi = webCtx.vsCodeApi;
     loadWebFiles(ctx, ['utils.ts', 'repoStateHelpers.ts', 'statePersistence.ts']);
   });

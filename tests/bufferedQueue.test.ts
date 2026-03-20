@@ -4,20 +4,20 @@ import { waitForExpect } from './helpers/expectations';
 
 describe('BufferedQueue', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.spyOn(global, 'setTimeout');
-    jest.spyOn(global, 'clearTimeout');
+    vi.useFakeTimers();
+    vi.spyOn(global, 'setTimeout');
+    vi.spyOn(global, 'clearTimeout');
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
-    jest.useRealTimers();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('Should add items to the queue, and then process them once the buffer has expired', async () => {
     // Setup
-    const onItem = jest.fn(() => Promise.resolve(true)),
-      onChanges = jest.fn(() => {});
+    const onItem = vi.fn(() => Promise.resolve(true)),
+      onChanges = vi.fn(() => {});
     const queue = new BufferedQueue<string>(onItem, onChanges);
 
     // Run
@@ -31,8 +31,8 @@ describe('BufferedQueue', () => {
     expect(clearTimeout).toHaveBeenCalledTimes(2);
 
     // Run
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
 
     // Assert
     await waitForExpect(() => expect(queue['processing']).toBe(false));
@@ -50,8 +50,8 @@ describe('BufferedQueue', () => {
 
   it("Shouldn't add duplicate items to the queue", async () => {
     // Setup
-    const onItem = jest.fn(() => Promise.resolve(true)),
-      onChanges = jest.fn(() => {});
+    const onItem = vi.fn(() => Promise.resolve(true)),
+      onChanges = vi.fn(() => {});
     const queue = new BufferedQueue<string>(onItem, onChanges);
 
     // Run
@@ -65,8 +65,8 @@ describe('BufferedQueue', () => {
     expect(queue['processing']).toBe(false);
 
     // Run
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
 
     // Assert
     await waitForExpect(() => expect(queue['processing']).toBe(false));
@@ -79,8 +79,8 @@ describe('BufferedQueue', () => {
 
   it("Shouldn't call onChanges if not items resulted in a change", async () => {
     // Setup
-    const onItem = jest.fn(() => Promise.resolve(false)),
-      onChanges = jest.fn(() => {});
+    const onItem = vi.fn(() => Promise.resolve(false)),
+      onChanges = vi.fn(() => {});
     const queue = new BufferedQueue<string>(onItem, onChanges);
 
     // Run
@@ -93,8 +93,8 @@ describe('BufferedQueue', () => {
     expect(queue['processing']).toBe(false);
 
     // Run
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
 
     // Assert
     await waitForExpect(() => expect(queue['processing']).toBe(false));
@@ -107,8 +107,8 @@ describe('BufferedQueue', () => {
 
   it("Shouldn't trigger a new timeout if the queue is already processing events", () => {
     // Setup
-    const onItem = jest.fn(() => Promise.resolve(true)),
-      onChanges = jest.fn(() => {});
+    const onItem = vi.fn(() => Promise.resolve(true)),
+      onChanges = vi.fn(() => {});
     const queue = new BufferedQueue<string>(onItem, onChanges);
     queue['processing'] = true;
 
@@ -124,8 +124,8 @@ describe('BufferedQueue', () => {
 
   it('Should clear the timeout when disposed', async () => {
     // Setup
-    const onItem = jest.fn(() => Promise.resolve(true)),
-      onChanges = jest.fn(() => {});
+    const onItem = vi.fn(() => Promise.resolve(true)),
+      onChanges = vi.fn(() => {});
     const queue = new BufferedQueue<string>(onItem, onChanges);
 
     // Run
@@ -136,21 +136,21 @@ describe('BufferedQueue', () => {
     // Assert
     expect(queue['queue']).toStrictEqual(['a', 'b', 'c']);
     expect(queue['processing']).toBe(false);
-    expect(jest.getTimerCount()).toBe(1);
+    expect(vi.getTimerCount()).toBe(1);
 
     // Run
     queue.dispose();
 
     // Assert
-    expect(jest.getTimerCount()).toBe(0);
+    expect(vi.getTimerCount()).toBe(0);
     expect(queue['timeout']).toBe(null);
   });
 
   describe('bufferDuration', () => {
     it('Should use the default buffer duration of 1000ms', async () => {
       // Setup
-      const onItem = jest.fn(() => Promise.resolve(true)),
-        onChanges = jest.fn(() => {});
+      const onItem = vi.fn(() => Promise.resolve(true)),
+        onChanges = vi.fn(() => {});
       const queue = new BufferedQueue<string>(onItem, onChanges);
 
       // Run
@@ -160,8 +160,8 @@ describe('BufferedQueue', () => {
       expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1000);
 
       // Run
-      jest.runOnlyPendingTimers();
-      jest.useRealTimers();
+      vi.runOnlyPendingTimers();
+      vi.useRealTimers();
 
       // Assert
       await waitForExpect(() => expect(queue['processing']).toBe(false));
@@ -172,8 +172,8 @@ describe('BufferedQueue', () => {
 
     it('Should use the specified buffer duration', async () => {
       // Setup
-      const onItem = jest.fn(() => Promise.resolve(true)),
-        onChanges = jest.fn(() => {});
+      const onItem = vi.fn(() => Promise.resolve(true)),
+        onChanges = vi.fn(() => {});
       const queue = new BufferedQueue<string>(onItem, onChanges, 128);
 
       // Run
@@ -183,8 +183,8 @@ describe('BufferedQueue', () => {
       expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 128);
 
       // Run
-      jest.runOnlyPendingTimers();
-      jest.useRealTimers();
+      vi.runOnlyPendingTimers();
+      vi.useRealTimers();
 
       // Assert
       await waitForExpect(() => expect(queue['processing']).toBe(false));

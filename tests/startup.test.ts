@@ -1,5 +1,4 @@
 import * as vscode from './mocks/vscode';
-jest.mock('vscode', () => vscode, { virtual: true });
 
 import { onStartUp } from '../src/life-cycle/startup';
 

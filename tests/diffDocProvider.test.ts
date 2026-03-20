@@ -1,7 +1,7 @@
 import * as vscode from './mocks/vscode';
-jest.mock('vscode', () => vscode, { virtual: true });
-jest.mock('../src/dataSource');
-jest.mock('../src/logger');
+
+vi.mock('../src/dataSource');
+vi.mock('../src/logger');
 
 import * as path from 'path';
 import { ConfigurationChangeEvent } from 'vscode';
@@ -51,7 +51,7 @@ describe('DiffDocProvider', () => {
       GitFileStatus.Modified,
       DiffSide.New
     );
-    jest.spyOn(dataSource, 'getCommitFile').mockResolvedValueOnce('file-contents');
+    vi.spyOn(dataSource, 'getCommitFile').mockResolvedValueOnce('file-contents');
 
     // Run
     const diffDocProvider = new DiffDocProvider(dataSource);
@@ -81,13 +81,13 @@ describe('DiffDocProvider', () => {
       GitFileStatus.Modified,
       DiffSide.New
     );
-    jest.spyOn(dataSource, 'getCommitFile').mockResolvedValueOnce('file-contents');
+    vi.spyOn(dataSource, 'getCommitFile').mockResolvedValueOnce('file-contents');
 
     let closeTextDocument: (doc: { uri: vscode.Uri }) => void;
     vscode.workspace.onDidCloseTextDocument.mockImplementationOnce(
       (callback: (_: { uri: vscode.Uri }) => void) => {
         closeTextDocument = callback;
-        return { dispose: jest.fn() };
+        return { dispose: vi.fn() };
       }
     );
 
@@ -118,7 +118,7 @@ describe('DiffDocProvider', () => {
       GitFileStatus.Modified,
       DiffSide.New
     );
-    const spyOnGetCommitFile = jest.spyOn(dataSource, 'getCommitFile');
+    const spyOnGetCommitFile = vi.spyOn(dataSource, 'getCommitFile');
     spyOnGetCommitFile.mockResolvedValueOnce('file-contents');
 
     // Run
@@ -165,7 +165,7 @@ describe('DiffDocProvider', () => {
       GitFileStatus.Modified,
       DiffSide.New
     );
-    jest.spyOn(dataSource, 'getCommitFile').mockRejectedValueOnce('error-message');
+    vi.spyOn(dataSource, 'getCommitFile').mockRejectedValueOnce('error-message');
     vscode.window.showErrorMessage.mockResolvedValue(null);
 
     // Run

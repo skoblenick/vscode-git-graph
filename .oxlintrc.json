@@ -49,6 +49,13 @@
 			"rules": {
 				"no-global-assign": "off"
 			}
+		},
+		{
+			"files": ["web/*.ts"],
+			"rules": {
+				"no-unused-vars": "off",
+				"no-control-regex": "off"
+			}
 		}
 	]
 }

@@ -14,7 +14,7 @@ pnpm compile-web      # Frontend only (web/ → media/)
 pnpm lint             # Run oxlint
 pnpm fmt              # Format with oxfmt
 pnpm fmt:check        # Check formatting
-pnpm test             # Run Jest tests
+pnpm test             # Run Vitest tests
 pnpm package          # Create .vsix package
 
 # Or install devbox first:
@@ -66,7 +66,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture.
 See [docs/ROADMAP.md](docs/ROADMAP.md) for detailed task tracking.
 
 ### Phase 1: Stabilization — ✅ Complete
-All tasks done: Node 20, TypeScript 5.9, ESLint 8, Jest 29, vscode engine 1.70, frozen lockfile, pnpm audit in CI.
+All tasks done: Node 20, TypeScript 5.9, ESLint 8, Vitest 4.x, vscode engine 1.70, frozen lockfile, pnpm audit in CI.
 
 ### Phase 2: Build Modernization — ✅ Complete
 All tasks done: Activation reduced to `onStartupFinished`, esbuild for backend + webview minification, original-fs patching removed, source maps added.
@@ -98,7 +98,7 @@ pnpm test -- --watch         # Watch mode
 pnpm test -- path/to/test    # Single file
 ```
 
-Tests use Jest with mocked VS Code API (`tests/mocks/vscode.ts`) and mocked git spawn (`tests/mocks/spawn.ts`).
+Tests use Vitest with mocked VS Code API (`tests/mocks/vscode.ts`) and mocked git spawn (`tests/mocks/spawn.ts`).
 
 ## Known Technical Debt
 

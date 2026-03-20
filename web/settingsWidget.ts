@@ -1078,7 +1078,8 @@ class SettingsWidget {
         try {
           if (issueRegex.indexOf('(') === -1 || issueRegex.indexOf(')') === -1) {
             regExpParseError = 'The regular expression does not contain a capturing group ( ).';
-          } else if (new RegExp(issueRegex, 'gu')) {
+          } else {
+            new RegExp(issueRegex, 'gu');
             regExpParseError = null;
           }
         } catch (e) {

@@ -39,7 +39,7 @@ export async function activate(context: vscode.ExtensionContext) {
     gitExecutable = await findGit(extensionState);
     gitExecutableEmitter.emit(gitExecutable);
     logger.log('Using ' + gitExecutable.path + ' (version: ' + gitExecutable.version + ')');
-  } catch (_) {
+  } catch {
     gitExecutable = null;
     showErrorMessage(UNABLE_TO_FIND_GIT_MSG);
     logger.logError(UNABLE_TO_FIND_GIT_MSG);

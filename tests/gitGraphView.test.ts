@@ -1,10 +1,10 @@
 import * as vscode from './mocks/vscode';
-jest.mock('vscode', () => vscode, { virtual: true });
-jest.mock('../src/avatarManager');
-jest.mock('../src/dataSource');
-jest.mock('../src/extensionState');
-jest.mock('../src/logger');
-jest.mock('../src/repoManager');
+
+vi.mock('../src/avatarManager');
+vi.mock('../src/dataSource');
+vi.mock('../src/extensionState');
+vi.mock('../src/logger');
+vi.mock('../src/repoManager');
 
 import * as path from 'path';
 import { ConfigurationChangeEvent } from 'vscode';
@@ -50,10 +50,10 @@ describe('GitGraphView', () => {
   let avatarManager: AvatarManager;
   let repoManager: RepoManager;
 
-  let spyOnLog: jest.SpyInstance;
-  let spyOnLogError: jest.SpyInstance;
-  let spyOnGetRepos: jest.SpyInstance;
-  let spyOnIsGitExecutableUnknown: jest.SpyInstance;
+  let spyOnLog: MockInstance;
+  let spyOnLogError: MockInstance;
+  let spyOnGetRepos: MockInstance;
+  let spyOnIsGitExecutableUnknown: MockInstance;
 
   beforeAll(() => {
     onDidChangeConfiguration = new EventEmitter<ConfigurationChangeEvent>();
@@ -80,10 +80,10 @@ describe('GitGraphView', () => {
       logger
     );
 
-    spyOnLog = jest.spyOn(logger, 'log');
-    spyOnLogError = jest.spyOn(logger, 'logError');
-    spyOnGetRepos = jest.spyOn(repoManager, 'getRepos');
-    spyOnIsGitExecutableUnknown = jest.spyOn(dataSource, 'isGitExecutableUnknown');
+    spyOnLog = vi.spyOn(logger, 'log');
+    spyOnLogError = vi.spyOn(logger, 'logError');
+    spyOnGetRepos = vi.spyOn(repoManager, 'getRepos');
+    spyOnIsGitExecutableUnknown = vi.spyOn(dataSource, 'isGitExecutableUnknown');
 
     spyOnGetRepos.mockReturnValue({ '/path/to/repo': mockRepoState() });
     spyOnIsGitExecutableUnknown.mockReturnValue(false);
@@ -93,7 +93,7 @@ describe('GitGraphView', () => {
     Object.defineProperty(avatarManager, 'onAvatar', {
       get: () => onAvatar.subscribe
     });
-    jest.spyOn(extensionState, 'getLastActiveRepo').mockReturnValue(null);
+    vi.spyOn(extensionState, 'getLastActiveRepo').mockReturnValue(null);
   });
 
   afterAll(() => {
@@ -437,7 +437,7 @@ describe('GitGraphView', () => {
           null
         );
         const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
-        const spyOnRepoFileWatcherStop = jest.spyOn(
+        const spyOnRepoFileWatcherStop = vi.spyOn(
           GitGraphView.currentPanel!['repoFileWatcher'],
           'stop'
         );
@@ -731,8 +731,8 @@ describe('GitGraphView', () => {
     let onDidReceiveMessage: (msg: RequestMessage) => void;
     let messages: ResponseMessage[];
 
-    let spyOnRepoFileWatcherMute: jest.SpyInstance;
-    let spyOnRepoFileWatcherUnmute: jest.SpyInstance;
+    let spyOnRepoFileWatcherMute: MockInstance;
+    let spyOnRepoFileWatcherUnmute: MockInstance;
     beforeEach(() => {
       GitGraphView.createOrShow(
         '/path/to/extension',
@@ -748,8 +748,8 @@ describe('GitGraphView', () => {
       onDidReceiveMessage = mockedWebviewPanel.mocks.panel.webview.onDidReceiveMessage;
       messages = mockedWebviewPanel.mocks.messages;
 
-      spyOnRepoFileWatcherMute = jest.spyOn(GitGraphView.currentPanel!['repoFileWatcher'], 'mute');
-      spyOnRepoFileWatcherUnmute = jest.spyOn(
+      spyOnRepoFileWatcherMute = vi.spyOn(GitGraphView.currentPanel!['repoFileWatcher'], 'mute');
+      spyOnRepoFileWatcherUnmute = vi.spyOn(
         GitGraphView.currentPanel!['repoFileWatcher'],
         'unmute'
       );
@@ -764,7 +764,7 @@ describe('GitGraphView', () => {
       it('Should add a remote', async () => {
         // Setup
         const addRemoteResolvedValue = null;
-        const spyOnAddRemote = jest.spyOn(dataSource, 'addRemote');
+        const spyOnAddRemote = vi.spyOn(dataSource, 'addRemote');
         spyOnAddRemote.mockResolvedValueOnce(addRemoteResolvedValue);
 
         // Run
@@ -800,8 +800,8 @@ describe('GitGraphView', () => {
       it('Should add a tag', async () => {
         // Setup
         const addTagResolvedValue = null;
-        const spyOnAddTag = jest.spyOn(dataSource, 'addTag');
-        const spyOnPushTag = jest.spyOn(dataSource, 'pushTag');
+        const spyOnAddTag = vi.spyOn(dataSource, 'addTag');
+        const spyOnPushTag = vi.spyOn(dataSource, 'pushTag');
         spyOnAddTag.mockResolvedValueOnce(addTagResolvedValue);
 
         // Run
@@ -845,8 +845,8 @@ describe('GitGraphView', () => {
         // Setup
         const addTagResolvedValue = null;
         const spyOnPushTagResolvedValue = [null];
-        const spyOnAddTag = jest.spyOn(dataSource, 'addTag');
-        const spyOnPushTag = jest.spyOn(dataSource, 'pushTag');
+        const spyOnAddTag = vi.spyOn(dataSource, 'addTag');
+        const spyOnPushTag = vi.spyOn(dataSource, 'pushTag');
         spyOnAddTag.mockResolvedValueOnce(addTagResolvedValue);
         spyOnPushTag.mockResolvedValueOnce(spyOnPushTagResolvedValue);
 
@@ -896,8 +896,8 @@ describe('GitGraphView', () => {
       it("Shouldn't push the tag if an error occurred when adding the tag", async () => {
         // Setup
         const addTagResolvedValue = 'error message';
-        const spyOnAddTag = jest.spyOn(dataSource, 'addTag');
-        const spyOnPushTag = jest.spyOn(dataSource, 'pushTag');
+        const spyOnAddTag = vi.spyOn(dataSource, 'addTag');
+        const spyOnPushTag = vi.spyOn(dataSource, 'pushTag');
         spyOnAddTag.mockResolvedValueOnce(addTagResolvedValue);
 
         // Run
@@ -942,7 +942,7 @@ describe('GitGraphView', () => {
       it('Should apply a stash', async () => {
         // Setup
         const applyStashResolvedValue = null;
-        const spyOnApplyStash = jest.spyOn(dataSource, 'applyStash');
+        const spyOnApplyStash = vi.spyOn(dataSource, 'applyStash');
         spyOnApplyStash.mockResolvedValueOnce(applyStashResolvedValue);
 
         // Run
@@ -970,7 +970,7 @@ describe('GitGraphView', () => {
       it('Should create a branch from a stash', async () => {
         // Setup
         const branchFromStashResolvedValue = null;
-        const spyOnBranchFromStash = jest.spyOn(dataSource, 'branchFromStash');
+        const spyOnBranchFromStash = vi.spyOn(dataSource, 'branchFromStash');
         spyOnBranchFromStash.mockResolvedValueOnce(branchFromStashResolvedValue);
 
         // Run
@@ -1002,8 +1002,8 @@ describe('GitGraphView', () => {
       it('Should check out a branch', async () => {
         // Setup
         const checkoutBranchResolvedValue = null;
-        const spyOnCheckoutBranch = jest.spyOn(dataSource, 'checkoutBranch');
-        const spyOnPullBranch = jest.spyOn(dataSource, 'pullBranch');
+        const spyOnCheckoutBranch = vi.spyOn(dataSource, 'checkoutBranch');
+        const spyOnPullBranch = vi.spyOn(dataSource, 'pullBranch');
         spyOnCheckoutBranch.mockResolvedValueOnce(checkoutBranchResolvedValue);
 
         // Run
@@ -1037,8 +1037,8 @@ describe('GitGraphView', () => {
         // Setup
         const checkoutBranchResolvedValue = null;
         const pullBranchResolvedValue = null;
-        const spyOnCheckoutBranch = jest.spyOn(dataSource, 'checkoutBranch');
-        const spyOnPullBranch = jest.spyOn(dataSource, 'pullBranch');
+        const spyOnCheckoutBranch = vi.spyOn(dataSource, 'checkoutBranch');
+        const spyOnPullBranch = vi.spyOn(dataSource, 'pullBranch');
         spyOnCheckoutBranch.mockResolvedValueOnce(checkoutBranchResolvedValue);
         spyOnPullBranch.mockResolvedValueOnce(pullBranchResolvedValue);
 
@@ -1084,8 +1084,8 @@ describe('GitGraphView', () => {
       it("Shouldn't pull the branch if an error occurred when checking out the branch", async () => {
         // Setup
         const checkoutBranchResolvedValue = 'error message';
-        const spyOnCheckoutBranch = jest.spyOn(dataSource, 'checkoutBranch');
-        const spyOnPullBranch = jest.spyOn(dataSource, 'pullBranch');
+        const spyOnCheckoutBranch = vi.spyOn(dataSource, 'checkoutBranch');
+        const spyOnPullBranch = vi.spyOn(dataSource, 'pullBranch');
         spyOnCheckoutBranch.mockResolvedValueOnce(checkoutBranchResolvedValue);
 
         // Run
@@ -1126,7 +1126,7 @@ describe('GitGraphView', () => {
       it('Should check out a commit', async () => {
         // Setup
         const checkoutCommitResolvedValue = null;
-        const spyOnCheckoutCommit = jest.spyOn(dataSource, 'checkoutCommit');
+        const spyOnCheckoutCommit = vi.spyOn(dataSource, 'checkoutCommit');
         spyOnCheckoutCommit.mockResolvedValueOnce(checkoutCommitResolvedValue);
 
         // Run
@@ -1156,8 +1156,8 @@ describe('GitGraphView', () => {
       it('Should cherrypick a commit', async () => {
         // Setup
         const cherrypickCommitResolvedValue = null;
-        const spyOnCherrypickCommit = jest.spyOn(dataSource, 'cherrypickCommit');
-        const spyOnViewScm = jest.spyOn(utils, 'viewScm');
+        const spyOnCherrypickCommit = vi.spyOn(dataSource, 'cherrypickCommit');
+        const spyOnViewScm = vi.spyOn(utils, 'viewScm');
         spyOnCherrypickCommit.mockResolvedValueOnce(cherrypickCommitResolvedValue);
 
         // Run
@@ -1193,8 +1193,8 @@ describe('GitGraphView', () => {
         // Setup
         const cherrypickCommitResolvedValue = null;
         const viewScmResolvedValue = null;
-        const spyOnCherrypickCommit = jest.spyOn(dataSource, 'cherrypickCommit');
-        const spyOnViewScm = jest.spyOn(utils, 'viewScm');
+        const spyOnCherrypickCommit = vi.spyOn(dataSource, 'cherrypickCommit');
+        const spyOnViewScm = vi.spyOn(utils, 'viewScm');
         spyOnCherrypickCommit.mockResolvedValueOnce(cherrypickCommitResolvedValue);
         spyOnViewScm.mockResolvedValueOnce(viewScmResolvedValue);
 
@@ -1230,8 +1230,8 @@ describe('GitGraphView', () => {
       it("Shouldn't open the Visual Studio Code Source Control View if an error occurred when cherrypicking the commit", async () => {
         // Setup
         const cherrypickCommitResolvedValue = 'error message';
-        const spyOnCherrypickCommit = jest.spyOn(dataSource, 'cherrypickCommit');
-        const spyOnViewScm = jest.spyOn(utils, 'viewScm');
+        const spyOnCherrypickCommit = vi.spyOn(dataSource, 'cherrypickCommit');
+        const spyOnViewScm = vi.spyOn(utils, 'viewScm');
         spyOnCherrypickCommit.mockResolvedValueOnce(cherrypickCommitResolvedValue);
 
         // Run
@@ -1268,7 +1268,7 @@ describe('GitGraphView', () => {
       it('Should clean the untracked files', async () => {
         // Setup
         const cleanUntrackedFilesResolvedValue = null;
-        const spyOnCleanUntrackedFiles = jest.spyOn(dataSource, 'cleanUntrackedFiles');
+        const spyOnCleanUntrackedFiles = vi.spyOn(dataSource, 'cleanUntrackedFiles');
         spyOnCleanUntrackedFiles.mockResolvedValueOnce(cleanUntrackedFilesResolvedValue);
 
         // Run
@@ -1302,9 +1302,9 @@ describe('GitGraphView', () => {
           lastViewedFile: 'file1.txt',
           remainingFiles: ['file2.txt', 'file3.txt']
         };
-        const spyOnGetCommitDetails = jest.spyOn(dataSource, 'getCommitDetails');
-        const spyOnGetAvatarImage = jest.spyOn(avatarManager, 'getAvatarImage');
-        const spyOnGetCodeReview = jest.spyOn(extensionState, 'getCodeReview');
+        const spyOnGetCommitDetails = vi.spyOn(dataSource, 'getCommitDetails');
+        const spyOnGetAvatarImage = vi.spyOn(avatarManager, 'getAvatarImage');
+        const spyOnGetCodeReview = vi.spyOn(extensionState, 'getCodeReview');
         spyOnGetCommitDetails.mockResolvedValueOnce(getCommitDetailsResolvedValue);
         spyOnGetAvatarImage.mockResolvedValueOnce(getAvatarImageResolvedValue);
         spyOnGetCodeReview.mockReturnValueOnce(getCodeReviewResolvedValue);
@@ -1348,9 +1348,9 @@ describe('GitGraphView', () => {
       it('Should get the data for the Commit Details View (Uncommitted Changes)', async () => {
         // Setup
         const getUncommittedDetailsResolvedValue = { commitDetails: null, error: null };
-        const spyOnGetUncommittedDetails = jest.spyOn(dataSource, 'getUncommittedDetails');
-        const spyOnGetAvatarImage = jest.spyOn(avatarManager, 'getAvatarImage');
-        const spyOnGetCodeReview = jest.spyOn(extensionState, 'getCodeReview');
+        const spyOnGetUncommittedDetails = vi.spyOn(dataSource, 'getUncommittedDetails');
+        const spyOnGetAvatarImage = vi.spyOn(avatarManager, 'getAvatarImage');
+        const spyOnGetCodeReview = vi.spyOn(extensionState, 'getCodeReview');
         spyOnGetUncommittedDetails.mockResolvedValueOnce(getUncommittedDetailsResolvedValue);
 
         // Run
@@ -1391,9 +1391,9 @@ describe('GitGraphView', () => {
         };
         const getStashDetailsResolvedValue = { commitDetails: null, error: null };
         const getCodeReviewResolvedValue = null;
-        const spyOnGetStashDetails = jest.spyOn(dataSource, 'getStashDetails');
-        const spyOnGetAvatarImage = jest.spyOn(avatarManager, 'getAvatarImage');
-        const spyOnGetCodeReview = jest.spyOn(extensionState, 'getCodeReview');
+        const spyOnGetStashDetails = vi.spyOn(dataSource, 'getStashDetails');
+        const spyOnGetAvatarImage = vi.spyOn(avatarManager, 'getAvatarImage');
+        const spyOnGetCodeReview = vi.spyOn(extensionState, 'getCodeReview');
         spyOnGetStashDetails.mockResolvedValueOnce(getStashDetailsResolvedValue);
         spyOnGetCodeReview.mockReturnValueOnce(getCodeReviewResolvedValue);
 
@@ -1444,8 +1444,8 @@ describe('GitGraphView', () => {
           lastViewedFile: 'file1.txt',
           remainingFiles: ['file2.txt', 'file3.txt']
         };
-        const spyOnGetCommitComparison = jest.spyOn(dataSource, 'getCommitComparison');
-        const spyOnGetCodeReview = jest.spyOn(extensionState, 'getCodeReview');
+        const spyOnGetCommitComparison = vi.spyOn(dataSource, 'getCommitComparison');
+        const spyOnGetCodeReview = vi.spyOn(extensionState, 'getCodeReview');
         spyOnGetCommitComparison.mockResolvedValueOnce(getCommitComparisonResolvedValue);
         spyOnGetCodeReview.mockReturnValueOnce(getCodeReviewResolvedValue);
 
@@ -1488,8 +1488,8 @@ describe('GitGraphView', () => {
       it('Should get the data for the Commit Details View (Comparison with the Uncommitted Changes)', async () => {
         // Setup
         const getCommitComparisonResolvedValue = { fileChanges: [], error: null };
-        const spyOnGetCommitComparison = jest.spyOn(dataSource, 'getCommitComparison');
-        const spyOnGetCodeReview = jest.spyOn(extensionState, 'getCodeReview');
+        const spyOnGetCommitComparison = vi.spyOn(dataSource, 'getCommitComparison');
+        const spyOnGetCodeReview = vi.spyOn(extensionState, 'getCodeReview');
         spyOnGetCommitComparison.mockResolvedValueOnce(getCommitComparisonResolvedValue);
 
         // Run
@@ -1530,7 +1530,7 @@ describe('GitGraphView', () => {
       it('Should copy a file path to the clipboard', async () => {
         // Setup
         const copyFilePathToClipboardResolvedValue = null;
-        const spyOnCopyFilePathToClipboard = jest.spyOn(utils, 'copyFilePathToClipboard');
+        const spyOnCopyFilePathToClipboard = vi.spyOn(utils, 'copyFilePathToClipboard');
         spyOnCopyFilePathToClipboard.mockResolvedValueOnce(copyFilePathToClipboardResolvedValue);
 
         // Run
@@ -1562,7 +1562,7 @@ describe('GitGraphView', () => {
       it('Should copy text to the clipboard', async () => {
         // Setup
         const copyToClipboardResolvedValue = null;
-        const spyOnCopyToClipboard = jest.spyOn(utils, 'copyToClipboard');
+        const spyOnCopyToClipboard = vi.spyOn(utils, 'copyToClipboard');
         spyOnCopyToClipboard.mockResolvedValueOnce(copyToClipboardResolvedValue);
 
         // Run
@@ -1590,7 +1590,7 @@ describe('GitGraphView', () => {
       it('Should create an archive', async () => {
         // Setup
         const archiveResolvedValue = null;
-        const spyOnArchive = jest.spyOn(utils, 'archive');
+        const spyOnArchive = vi.spyOn(utils, 'archive');
         spyOnArchive.mockResolvedValueOnce(archiveResolvedValue);
 
         // Run
@@ -1617,7 +1617,7 @@ describe('GitGraphView', () => {
       it('Should create a branch', async () => {
         // Setup
         const createBranchResolvedValue = [null];
-        const spyOnCreateBranch = jest.spyOn(dataSource, 'createBranch');
+        const spyOnCreateBranch = vi.spyOn(dataSource, 'createBranch');
         spyOnCreateBranch.mockResolvedValueOnce(createBranchResolvedValue);
 
         // Run
@@ -1666,8 +1666,8 @@ describe('GitGraphView', () => {
           destProjectId: 'destProjectId'
         };
         const createPullRequestResolvedValue = null;
-        const spyOnPushBranch = jest.spyOn(dataSource, 'pushBranch');
-        const spyOnCreatePullRequest = jest.spyOn(utils, 'createPullRequest');
+        const spyOnPushBranch = vi.spyOn(dataSource, 'pushBranch');
+        const spyOnCreatePullRequest = vi.spyOn(utils, 'createPullRequest');
         spyOnCreatePullRequest.mockResolvedValueOnce(createPullRequestResolvedValue);
 
         // Run
@@ -1718,8 +1718,8 @@ describe('GitGraphView', () => {
         };
         const pushBranchResolvedValue = null;
         const createPullRequestResolvedValue = null;
-        const spyOnPushBranch = jest.spyOn(dataSource, 'pushBranch');
-        const spyOnCreatePullRequest = jest.spyOn(utils, 'createPullRequest');
+        const spyOnPushBranch = vi.spyOn(dataSource, 'pushBranch');
+        const spyOnCreatePullRequest = vi.spyOn(utils, 'createPullRequest');
         spyOnPushBranch.mockResolvedValueOnce(pushBranchResolvedValue);
         spyOnCreatePullRequest.mockResolvedValueOnce(createPullRequestResolvedValue);
 
@@ -1777,8 +1777,8 @@ describe('GitGraphView', () => {
           destProjectId: 'destProjectId'
         };
         const pushBranchResolvedValue = 'error message';
-        const spyOnPushBranch = jest.spyOn(dataSource, 'pushBranch');
-        const spyOnCreatePullRequest = jest.spyOn(utils, 'createPullRequest');
+        const spyOnPushBranch = vi.spyOn(dataSource, 'pushBranch');
+        const spyOnCreatePullRequest = vi.spyOn(utils, 'createPullRequest');
         spyOnPushBranch.mockResolvedValueOnce(pushBranchResolvedValue);
 
         // Run
@@ -1819,8 +1819,8 @@ describe('GitGraphView', () => {
       it('Should delete a branch', async () => {
         // Setup
         const deleteBranchResolvedValue = null;
-        const spyOnDeleteBranch = jest.spyOn(dataSource, 'deleteBranch');
-        const spyOnDeleteRemoteBranch = jest.spyOn(dataSource, 'deleteRemoteBranch');
+        const spyOnDeleteBranch = vi.spyOn(dataSource, 'deleteBranch');
+        const spyOnDeleteRemoteBranch = vi.spyOn(dataSource, 'deleteRemoteBranch');
         spyOnDeleteBranch.mockResolvedValueOnce(deleteBranchResolvedValue);
 
         // Run
@@ -1853,8 +1853,8 @@ describe('GitGraphView', () => {
         const deleteBranchResolvedValue = null;
         const deleteRemoteBranchResolvedValue1 = null;
         const deleteRemoteBranchResolvedValue2 = null;
-        const spyOnDeleteBranch = jest.spyOn(dataSource, 'deleteBranch');
-        const spyOnDeleteRemoteBranch = jest.spyOn(dataSource, 'deleteRemoteBranch');
+        const spyOnDeleteBranch = vi.spyOn(dataSource, 'deleteBranch');
+        const spyOnDeleteRemoteBranch = vi.spyOn(dataSource, 'deleteRemoteBranch');
         spyOnDeleteBranch.mockResolvedValueOnce(deleteBranchResolvedValue);
         spyOnDeleteRemoteBranch.mockResolvedValueOnce(deleteRemoteBranchResolvedValue1);
         spyOnDeleteRemoteBranch.mockResolvedValueOnce(deleteRemoteBranchResolvedValue2);
@@ -1902,8 +1902,8 @@ describe('GitGraphView', () => {
       it("Shouldn't delete a branch on a remote if an error occurred when deleting the local branch", async () => {
         // Setup
         const deleteBranchResolvedValue = 'error message';
-        const spyOnDeleteBranch = jest.spyOn(dataSource, 'deleteBranch');
-        const spyOnDeleteRemoteBranch = jest.spyOn(dataSource, 'deleteRemoteBranch');
+        const spyOnDeleteBranch = vi.spyOn(dataSource, 'deleteBranch');
+        const spyOnDeleteRemoteBranch = vi.spyOn(dataSource, 'deleteRemoteBranch');
         spyOnDeleteBranch.mockResolvedValueOnce(deleteBranchResolvedValue);
 
         // Run
@@ -1936,7 +1936,7 @@ describe('GitGraphView', () => {
       it('Should delete a remote', async () => {
         // Setup
         const deleteRemoteResolvedValue = null;
-        const spyOnDeleteRemote = jest.spyOn(dataSource, 'deleteRemote');
+        const spyOnDeleteRemote = vi.spyOn(dataSource, 'deleteRemote');
         spyOnDeleteRemote.mockResolvedValueOnce(deleteRemoteResolvedValue);
 
         // Run
@@ -1963,7 +1963,7 @@ describe('GitGraphView', () => {
       it('Should delete a remote branch', async () => {
         // Setup
         const deleteRemoteBranchResolvedValue = null;
-        const spyOnDeleteRemoteBranch = jest.spyOn(dataSource, 'deleteRemoteBranch');
+        const spyOnDeleteRemoteBranch = vi.spyOn(dataSource, 'deleteRemoteBranch');
         spyOnDeleteRemoteBranch.mockResolvedValueOnce(deleteRemoteBranchResolvedValue);
 
         // Run
@@ -1995,7 +1995,7 @@ describe('GitGraphView', () => {
       it('Should delete a tag', async () => {
         // Setup
         const deleteTagResolvedValue = null;
-        const spyOnDeleteTag = jest.spyOn(dataSource, 'deleteTag');
+        const spyOnDeleteTag = vi.spyOn(dataSource, 'deleteTag');
         spyOnDeleteTag.mockResolvedValueOnce(deleteTagResolvedValue);
 
         // Run
@@ -2024,7 +2024,7 @@ describe('GitGraphView', () => {
         // Setup
         const unsetConfigValueResolvedValue1 = null;
         const unsetConfigValueResolvedValue2 = null;
-        const spyOnUnsetConfigValue = jest.spyOn(dataSource, 'unsetConfigValue');
+        const spyOnUnsetConfigValue = vi.spyOn(dataSource, 'unsetConfigValue');
         spyOnUnsetConfigValue.mockResolvedValueOnce(unsetConfigValueResolvedValue1);
         spyOnUnsetConfigValue.mockResolvedValueOnce(unsetConfigValueResolvedValue2);
 
@@ -2063,7 +2063,7 @@ describe('GitGraphView', () => {
       it('Should only delete user.name', async () => {
         // Setup
         const unsetConfigValueResolvedValue = null;
-        const spyOnUnsetConfigValue = jest.spyOn(dataSource, 'unsetConfigValue');
+        const spyOnUnsetConfigValue = vi.spyOn(dataSource, 'unsetConfigValue');
         spyOnUnsetConfigValue.mockResolvedValueOnce(unsetConfigValueResolvedValue);
 
         // Run
@@ -2095,7 +2095,7 @@ describe('GitGraphView', () => {
       it('Should only delete user.email', async () => {
         // Setup
         const unsetConfigValueResolvedValue = null;
-        const spyOnUnsetConfigValue = jest.spyOn(dataSource, 'unsetConfigValue');
+        const spyOnUnsetConfigValue = vi.spyOn(dataSource, 'unsetConfigValue');
         spyOnUnsetConfigValue.mockResolvedValueOnce(unsetConfigValueResolvedValue);
 
         // Run
@@ -2129,7 +2129,7 @@ describe('GitGraphView', () => {
       it('Should drop a commit', async () => {
         // Setup
         const dropCommitResolvedValue = null;
-        const spyOnDropCommit = jest.spyOn(dataSource, 'dropCommit');
+        const spyOnDropCommit = vi.spyOn(dataSource, 'dropCommit');
         spyOnDropCommit.mockResolvedValueOnce(dropCommitResolvedValue);
 
         // Run
@@ -2159,7 +2159,7 @@ describe('GitGraphView', () => {
       it('Should drop a stash', async () => {
         // Setup
         const dropStashResolvedValue = null;
-        const spyOnDropStash = jest.spyOn(dataSource, 'dropStash');
+        const spyOnDropStash = vi.spyOn(dataSource, 'dropStash');
         spyOnDropStash.mockResolvedValueOnce(dropStashResolvedValue);
 
         // Run
@@ -2186,7 +2186,7 @@ describe('GitGraphView', () => {
       it('Should edit a remote', async () => {
         // Setup
         const editRemoteResolvedValue = null;
-        const spyOnEditRemote = jest.spyOn(dataSource, 'editRemote');
+        const spyOnEditRemote = vi.spyOn(dataSource, 'editRemote');
         spyOnEditRemote.mockResolvedValueOnce(editRemoteResolvedValue);
 
         // Run
@@ -2227,8 +2227,8 @@ describe('GitGraphView', () => {
         // Setup
         const setConfigValueResolvedValue1 = null;
         const setConfigValueResolvedValue2 = null;
-        const spyOnSetConfigValue = jest.spyOn(dataSource, 'setConfigValue');
-        const spyOnUnsetConfigValue = jest.spyOn(dataSource, 'unsetConfigValue');
+        const spyOnSetConfigValue = vi.spyOn(dataSource, 'setConfigValue');
+        const spyOnUnsetConfigValue = vi.spyOn(dataSource, 'unsetConfigValue');
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue1);
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue2);
 
@@ -2275,8 +2275,8 @@ describe('GitGraphView', () => {
         const setConfigValueResolvedValue2 = null;
         const unsetConfigValueResolvedValue1 = null;
         const unsetConfigValueResolvedValue2 = null;
-        const spyOnSetConfigValue = jest.spyOn(dataSource, 'setConfigValue');
-        const spyOnUnsetConfigValue = jest.spyOn(dataSource, 'unsetConfigValue');
+        const spyOnSetConfigValue = vi.spyOn(dataSource, 'setConfigValue');
+        const spyOnUnsetConfigValue = vi.spyOn(dataSource, 'unsetConfigValue');
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue1);
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue2);
         spyOnUnsetConfigValue.mockResolvedValueOnce(unsetConfigValueResolvedValue1);
@@ -2340,8 +2340,8 @@ describe('GitGraphView', () => {
         const setConfigValueResolvedValue1 = null;
         const setConfigValueResolvedValue2 = null;
         const unsetConfigValueResolvedValue = null;
-        const spyOnSetConfigValue = jest.spyOn(dataSource, 'setConfigValue');
-        const spyOnUnsetConfigValue = jest.spyOn(dataSource, 'unsetConfigValue');
+        const spyOnSetConfigValue = vi.spyOn(dataSource, 'setConfigValue');
+        const spyOnUnsetConfigValue = vi.spyOn(dataSource, 'unsetConfigValue');
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue1);
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue2);
         spyOnUnsetConfigValue.mockResolvedValueOnce(unsetConfigValueResolvedValue);
@@ -2397,8 +2397,8 @@ describe('GitGraphView', () => {
         const setConfigValueResolvedValue1 = null;
         const setConfigValueResolvedValue2 = null;
         const unsetConfigValueResolvedValue = null;
-        const spyOnSetConfigValue = jest.spyOn(dataSource, 'setConfigValue');
-        const spyOnUnsetConfigValue = jest.spyOn(dataSource, 'unsetConfigValue');
+        const spyOnSetConfigValue = vi.spyOn(dataSource, 'setConfigValue');
+        const spyOnUnsetConfigValue = vi.spyOn(dataSource, 'unsetConfigValue');
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue1);
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue2);
         spyOnUnsetConfigValue.mockResolvedValueOnce(unsetConfigValueResolvedValue);
@@ -2453,8 +2453,8 @@ describe('GitGraphView', () => {
         // Setup
         const setConfigValueResolvedValue1 = 'error message';
         const setConfigValueResolvedValue2 = null;
-        const spyOnSetConfigValue = jest.spyOn(dataSource, 'setConfigValue');
-        const spyOnUnsetConfigValue = jest.spyOn(dataSource, 'unsetConfigValue');
+        const spyOnSetConfigValue = vi.spyOn(dataSource, 'setConfigValue');
+        const spyOnUnsetConfigValue = vi.spyOn(dataSource, 'unsetConfigValue');
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue1);
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue2);
 
@@ -2499,8 +2499,8 @@ describe('GitGraphView', () => {
         // Setup
         const setConfigValueResolvedValue1 = null;
         const setConfigValueResolvedValue2 = 'error message';
-        const spyOnSetConfigValue = jest.spyOn(dataSource, 'setConfigValue');
-        const spyOnUnsetConfigValue = jest.spyOn(dataSource, 'unsetConfigValue');
+        const spyOnSetConfigValue = vi.spyOn(dataSource, 'setConfigValue');
+        const spyOnUnsetConfigValue = vi.spyOn(dataSource, 'unsetConfigValue');
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue1);
         spyOnSetConfigValue.mockResolvedValueOnce(setConfigValueResolvedValue2);
 
@@ -2545,7 +2545,7 @@ describe('GitGraphView', () => {
     describe('endCodeReview', () => {
       it('Should end a code review', async () => {
         // Setup
-        const spyOnEndCodeReview = jest.spyOn(extensionState, 'endCodeReview');
+        const spyOnEndCodeReview = vi.spyOn(extensionState, 'endCodeReview');
         spyOnEndCodeReview.mockResolvedValueOnce(null);
 
         // Run
@@ -2570,7 +2570,7 @@ describe('GitGraphView', () => {
       it('Should export the repository configuration', async () => {
         // Setup
         const exportRepoConfigResolvedValue = null;
-        const spyOnExportRepoConfig = jest.spyOn(repoManager, 'exportRepoConfig');
+        const spyOnExportRepoConfig = vi.spyOn(repoManager, 'exportRepoConfig');
         spyOnExportRepoConfig.mockResolvedValueOnce(exportRepoConfigResolvedValue);
 
         // Run
@@ -2596,7 +2596,7 @@ describe('GitGraphView', () => {
       it('Should fetch a remote, and prune it', async () => {
         // Setup
         const fetchResolvedValue = null;
-        const spyOnFetch = jest.spyOn(dataSource, 'fetch');
+        const spyOnFetch = vi.spyOn(dataSource, 'fetch');
         spyOnFetch.mockResolvedValueOnce(fetchResolvedValue);
 
         // Run
@@ -2624,7 +2624,7 @@ describe('GitGraphView', () => {
     describe('fetchAvatar', () => {
       it('Should fetch an avatar', async () => {
         // Setup
-        const spyOnFetchAvatarImage = jest.spyOn(avatarManager, 'fetchAvatarImage');
+        const spyOnFetchAvatarImage = vi.spyOn(avatarManager, 'fetchAvatarImage');
         spyOnFetchAvatarImage.mockImplementationOnce(() => {});
 
         // Run
@@ -2653,7 +2653,7 @@ describe('GitGraphView', () => {
       it('Should fetch into local branch', async () => {
         // Setup
         const fetchIntoLocalBranchResolvedValue = null;
-        const spyOnFetchIntoLocalBranch = jest.spyOn(dataSource, 'fetchIntoLocalBranch');
+        const spyOnFetchIntoLocalBranch = vi.spyOn(dataSource, 'fetchIntoLocalBranch');
         spyOnFetchIntoLocalBranch.mockResolvedValueOnce(fetchIntoLocalBranchResolvedValue);
 
         // Run
@@ -2709,7 +2709,7 @@ describe('GitGraphView', () => {
 
       it('Should get commits (show tags)', async () => {
         // Setup
-        const spyOnGetCommits = jest.spyOn(dataSource, 'getCommits');
+        const spyOnGetCommits = vi.spyOn(dataSource, 'getCommits');
         spyOnGetCommits.mockResolvedValueOnce(getCommitsResolvedValue);
 
         // Run
@@ -2762,7 +2762,7 @@ describe('GitGraphView', () => {
 
       it('Should get commits (show remote branches)', async () => {
         // Setup
-        const spyOnGetCommits = jest.spyOn(dataSource, 'getCommits');
+        const spyOnGetCommits = vi.spyOn(dataSource, 'getCommits');
         spyOnGetCommits.mockResolvedValueOnce(getCommitsResolvedValue);
 
         // Run
@@ -2815,7 +2815,7 @@ describe('GitGraphView', () => {
 
       it('Should get commits (include commits mentioned by reflogs)', async () => {
         // Setup
-        const spyOnGetCommits = jest.spyOn(dataSource, 'getCommits');
+        const spyOnGetCommits = vi.spyOn(dataSource, 'getCommits');
         spyOnGetCommits.mockResolvedValueOnce(getCommitsResolvedValue);
 
         // Run
@@ -2868,7 +2868,7 @@ describe('GitGraphView', () => {
 
       it('Should get commits (only follow first parent)', async () => {
         // Setup
-        const spyOnGetCommits = jest.spyOn(dataSource, 'getCommits');
+        const spyOnGetCommits = vi.spyOn(dataSource, 'getCommits');
         spyOnGetCommits.mockResolvedValueOnce(getCommitsResolvedValue);
 
         // Run
@@ -2930,10 +2930,10 @@ describe('GitGraphView', () => {
           stashes: [],
           error: null
         };
-        const spyOnGetRepoInfo = jest.spyOn(dataSource, 'getRepoInfo');
-        const spyOnRepoRoot = jest.spyOn(dataSource, 'repoRoot');
-        const spyOnSetLastActiveRepo = jest.spyOn(extensionState, 'setLastActiveRepo');
-        const spyOnRepoFileWatcherStart = jest.spyOn(
+        const spyOnGetRepoInfo = vi.spyOn(dataSource, 'getRepoInfo');
+        const spyOnRepoRoot = vi.spyOn(dataSource, 'repoRoot');
+        const spyOnSetLastActiveRepo = vi.spyOn(extensionState, 'setLastActiveRepo');
+        const spyOnRepoFileWatcherStart = vi.spyOn(
           GitGraphView.currentPanel!['repoFileWatcher'],
           'start'
         );
@@ -2983,10 +2983,10 @@ describe('GitGraphView', () => {
           stashes: [],
           error: null
         };
-        const spyOnGetRepoInfo = jest.spyOn(dataSource, 'getRepoInfo');
-        const spyOnRepoRoot = jest.spyOn(dataSource, 'repoRoot');
-        const spyOnSetLastActiveRepo = jest.spyOn(extensionState, 'setLastActiveRepo');
-        const spyOnRepoFileWatcherStart = jest.spyOn(
+        const spyOnGetRepoInfo = vi.spyOn(dataSource, 'getRepoInfo');
+        const spyOnRepoRoot = vi.spyOn(dataSource, 'repoRoot');
+        const spyOnSetLastActiveRepo = vi.spyOn(extensionState, 'setLastActiveRepo');
+        const spyOnRepoFileWatcherStart = vi.spyOn(
           GitGraphView.currentPanel!['repoFileWatcher'],
           'start'
         );
@@ -3035,10 +3035,10 @@ describe('GitGraphView', () => {
           stashes: [],
           error: 'error message'
         };
-        const spyOnGetRepoInfo = jest.spyOn(dataSource, 'getRepoInfo');
-        const spyOnRepoRoot = jest.spyOn(dataSource, 'repoRoot');
-        const spyOnSetLastActiveRepo = jest.spyOn(extensionState, 'setLastActiveRepo');
-        const spyOnRepoFileWatcherStart = jest.spyOn(
+        const spyOnGetRepoInfo = vi.spyOn(dataSource, 'getRepoInfo');
+        const spyOnRepoRoot = vi.spyOn(dataSource, 'repoRoot');
+        const spyOnSetLastActiveRepo = vi.spyOn(extensionState, 'setLastActiveRepo');
+        const spyOnRepoFileWatcherStart = vi.spyOn(
           GitGraphView.currentPanel!['repoFileWatcher'],
           'start'
         );
@@ -3088,10 +3088,10 @@ describe('GitGraphView', () => {
           stashes: [],
           error: 'error message'
         };
-        const spyOnGetRepoInfo = jest.spyOn(dataSource, 'getRepoInfo');
-        const spyOnRepoRoot = jest.spyOn(dataSource, 'repoRoot');
-        const spyOnSetLastActiveRepo = jest.spyOn(extensionState, 'setLastActiveRepo');
-        const spyOnRepoFileWatcherStart = jest.spyOn(
+        const spyOnGetRepoInfo = vi.spyOn(dataSource, 'getRepoInfo');
+        const spyOnRepoRoot = vi.spyOn(dataSource, 'repoRoot');
+        const spyOnSetLastActiveRepo = vi.spyOn(extensionState, 'setLastActiveRepo');
+        const spyOnRepoFileWatcherStart = vi.spyOn(
           GitGraphView.currentPanel!['repoFileWatcher'],
           'start'
         );
@@ -3137,7 +3137,7 @@ describe('GitGraphView', () => {
       it('Should get the Git configuration for a repository', async () => {
         // Setup
         const getConfigResolvedValue = { config: null, error: null };
-        const spyOnGetConfig = jest.spyOn(dataSource, 'getConfig');
+        const spyOnGetConfig = vi.spyOn(dataSource, 'getConfig');
         spyOnGetConfig.mockResolvedValueOnce(getConfigResolvedValue);
 
         // Run
@@ -3165,7 +3165,7 @@ describe('GitGraphView', () => {
     describe('loadRepos', () => {
       it('Should load the repositories (without checking for new repositories)', async () => {
         // Setup
-        const spyOnCheckReposExist = jest.spyOn(repoManager, 'checkReposExist');
+        const spyOnCheckReposExist = vi.spyOn(repoManager, 'checkReposExist');
 
         // Run
         onDidReceiveMessage({
@@ -3189,7 +3189,7 @@ describe('GitGraphView', () => {
 
       it('Should load the repositories (found one new repository)', async () => {
         // Setup
-        const spyOnCheckReposExist = jest.spyOn(repoManager, 'checkReposExist');
+        const spyOnCheckReposExist = vi.spyOn(repoManager, 'checkReposExist');
         spyOnCheckReposExist.mockResolvedValueOnce(true);
 
         // Run
@@ -3207,7 +3207,7 @@ describe('GitGraphView', () => {
 
       it('Should load the repositories (no new repositories)', async () => {
         // Setup
-        const spyOnCheckReposExist = jest.spyOn(repoManager, 'checkReposExist');
+        const spyOnCheckReposExist = vi.spyOn(repoManager, 'checkReposExist');
         spyOnCheckReposExist.mockResolvedValueOnce(false);
 
         // Run
@@ -3235,7 +3235,7 @@ describe('GitGraphView', () => {
       it('Should perform a merge (creating a new commit)', async () => {
         // Setup
         const mergeResolvedValue = null;
-        const spyOnMerge = jest.spyOn(dataSource, 'merge');
+        const spyOnMerge = vi.spyOn(dataSource, 'merge');
         spyOnMerge.mockResolvedValueOnce(mergeResolvedValue);
 
         // Run
@@ -3272,7 +3272,7 @@ describe('GitGraphView', () => {
       it('Should perform a merge (squash)', async () => {
         // Setup
         const mergeResolvedValue = null;
-        const spyOnMerge = jest.spyOn(dataSource, 'merge');
+        const spyOnMerge = vi.spyOn(dataSource, 'merge');
         spyOnMerge.mockResolvedValueOnce(mergeResolvedValue);
 
         // Run
@@ -3309,7 +3309,7 @@ describe('GitGraphView', () => {
       it('Should perform a merge (no commit)', async () => {
         // Setup
         const mergeResolvedValue = null;
-        const spyOnMerge = jest.spyOn(dataSource, 'merge');
+        const spyOnMerge = vi.spyOn(dataSource, 'merge');
         spyOnMerge.mockResolvedValueOnce(mergeResolvedValue);
 
         // Run
@@ -3348,7 +3348,7 @@ describe('GitGraphView', () => {
       it('Should open the Extension Settings', async () => {
         // Setup
         const openExtensionSettingsResolvedValue = null;
-        const spyOnOpenExtensionSettings = jest.spyOn(utils, 'openExtensionSettings');
+        const spyOnOpenExtensionSettings = vi.spyOn(utils, 'openExtensionSettings');
         spyOnOpenExtensionSettings.mockResolvedValueOnce(openExtensionSettingsResolvedValue);
 
         // Run
@@ -3373,7 +3373,7 @@ describe('GitGraphView', () => {
       it('Should open an External Directory Diff', async () => {
         // Setup
         const openExternalDirDiffResolvedValue = null;
-        const spyOnOpenExternalDirDiff = jest.spyOn(dataSource, 'openExternalDirDiff');
+        const spyOnOpenExternalDirDiff = vi.spyOn(dataSource, 'openExternalDirDiff');
         spyOnOpenExternalDirDiff.mockResolvedValueOnce(openExternalDirDiffResolvedValue);
 
         // Run
@@ -3407,7 +3407,7 @@ describe('GitGraphView', () => {
       it('Should open an External URL', async () => {
         // Setup
         const openExternalUrlResolvedValue = null;
-        const spyOnOpenExternalUrl = jest.spyOn(utils, 'openExternalUrl');
+        const spyOnOpenExternalUrl = vi.spyOn(utils, 'openExternalUrl');
         spyOnOpenExternalUrl.mockResolvedValueOnce(openExternalUrlResolvedValue);
 
         // Run
@@ -3433,7 +3433,7 @@ describe('GitGraphView', () => {
       it('Should open a file', async () => {
         // Setup
         const openFileResolvedValue = null;
-        const spyOnOpenFile = jest.spyOn(utils, 'openFile');
+        const spyOnOpenFile = vi.spyOn(utils, 'openFile');
         spyOnOpenFile.mockResolvedValueOnce(openFileResolvedValue);
 
         // Run
@@ -3466,7 +3466,7 @@ describe('GitGraphView', () => {
       it('Should open a terminal', async () => {
         // Setup
         const openGitTerminalResolvedValue = null;
-        const spyOnOpenGitTerminal = jest.spyOn(dataSource, 'openGitTerminal');
+        const spyOnOpenGitTerminal = vi.spyOn(dataSource, 'openGitTerminal');
         spyOnOpenGitTerminal.mockResolvedValueOnce(openGitTerminalResolvedValue);
 
         // Run
@@ -3493,7 +3493,7 @@ describe('GitGraphView', () => {
       it('Should pop a stash', async () => {
         // Setup
         const popStashResolvedValue = null;
-        const spyOnPopStash = jest.spyOn(dataSource, 'popStash');
+        const spyOnPopStash = vi.spyOn(dataSource, 'popStash');
         spyOnPopStash.mockResolvedValueOnce(popStashResolvedValue);
 
         // Run
@@ -3521,7 +3521,7 @@ describe('GitGraphView', () => {
       it('Should prune a remote', async () => {
         // Setup
         const pruneRemoteResolvedValue = null;
-        const spyOnPruneRemote = jest.spyOn(dataSource, 'pruneRemote');
+        const spyOnPruneRemote = vi.spyOn(dataSource, 'pruneRemote');
         spyOnPruneRemote.mockResolvedValueOnce(pruneRemoteResolvedValue);
 
         // Run
@@ -3548,7 +3548,7 @@ describe('GitGraphView', () => {
       it('Should pull a branch from a remote', async () => {
         // Setup
         const pullBranchResolvedValue = null;
-        const spyOnPullBranch = jest.spyOn(dataSource, 'pullBranch');
+        const spyOnPullBranch = vi.spyOn(dataSource, 'pullBranch');
         spyOnPullBranch.mockResolvedValueOnce(pullBranchResolvedValue);
 
         // Run
@@ -3584,7 +3584,7 @@ describe('GitGraphView', () => {
       it('Should push a branch to a remote', async () => {
         // Setup
         const pushBranchToMultipleRemotesResolvedValue = [null];
-        const spyOnPushBranchToMultipleRemotes = jest.spyOn(
+        const spyOnPushBranchToMultipleRemotes = vi.spyOn(
           dataSource,
           'pushBranchToMultipleRemotes'
         );
@@ -3627,7 +3627,7 @@ describe('GitGraphView', () => {
       it('Should push a stash', async () => {
         // Setup
         const pushStashResolvedValue = null;
-        const spyOnPushStash = jest.spyOn(dataSource, 'pushStash');
+        const spyOnPushStash = vi.spyOn(dataSource, 'pushStash');
         spyOnPushStash.mockResolvedValueOnce(pushStashResolvedValue);
 
         // Run
@@ -3655,7 +3655,7 @@ describe('GitGraphView', () => {
       it('Should push a tag to a remote', async () => {
         // Setup
         const spyOnPushTagResolvedValue = [null];
-        const spyOnPushTag = jest.spyOn(dataSource, 'pushTag');
+        const spyOnPushTag = vi.spyOn(dataSource, 'pushTag');
         spyOnPushTag.mockResolvedValueOnce(spyOnPushTagResolvedValue);
 
         // Run
@@ -3695,7 +3695,7 @@ describe('GitGraphView', () => {
       it('Should rebase the current branch on a branch', async () => {
         // Setup
         const rebaseResolvedValue = null;
-        const spyOnRebase = jest.spyOn(dataSource, 'rebase');
+        const spyOnRebase = vi.spyOn(dataSource, 'rebase');
         spyOnRebase.mockResolvedValueOnce(rebaseResolvedValue);
 
         // Run
@@ -3733,7 +3733,7 @@ describe('GitGraphView', () => {
       it('Should rename a branch', async () => {
         // Setup
         const renameBranchResolvedValue = null;
-        const spyOnRenameBranch = jest.spyOn(dataSource, 'renameBranch');
+        const spyOnRenameBranch = vi.spyOn(dataSource, 'renameBranch');
         spyOnRenameBranch.mockResolvedValueOnce(renameBranchResolvedValue);
 
         // Run
@@ -3764,8 +3764,8 @@ describe('GitGraphView', () => {
     describe('rescanForRepos', () => {
       it('Should rescan the workspace for repositories (repositories added)', async () => {
         // Setup
-        const spyOnSearchWorkspaceForRepos = jest.spyOn(repoManager, 'searchWorkspaceForRepos');
-        const spyOnShowErrorMessage = jest.spyOn(utils, 'showErrorMessage');
+        const spyOnSearchWorkspaceForRepos = vi.spyOn(repoManager, 'searchWorkspaceForRepos');
+        const spyOnShowErrorMessage = vi.spyOn(utils, 'showErrorMessage');
         spyOnSearchWorkspaceForRepos.mockResolvedValueOnce(true);
 
         // Run
@@ -3783,8 +3783,8 @@ describe('GitGraphView', () => {
 
       it('Should rescan the workspace for repositories (no new repositories were found)', async () => {
         // Setup
-        const spyOnSearchWorkspaceForRepos = jest.spyOn(repoManager, 'searchWorkspaceForRepos');
-        const spyOnShowErrorMessage = jest.spyOn(utils, 'showErrorMessage');
+        const spyOnSearchWorkspaceForRepos = vi.spyOn(repoManager, 'searchWorkspaceForRepos');
+        const spyOnShowErrorMessage = vi.spyOn(utils, 'showErrorMessage');
         spyOnSearchWorkspaceForRepos.mockResolvedValueOnce(false);
         spyOnShowErrorMessage.mockResolvedValueOnce();
 
@@ -3808,7 +3808,7 @@ describe('GitGraphView', () => {
       it('Should reset the file to a revision', async () => {
         // Setup
         const resetFileToRevisionResolvedValue = null;
-        const spyOnResetFileToRevision = jest.spyOn(dataSource, 'resetFileToRevision');
+        const spyOnResetFileToRevision = vi.spyOn(dataSource, 'resetFileToRevision');
         spyOnResetFileToRevision.mockResolvedValueOnce(resetFileToRevisionResolvedValue);
 
         // Run
@@ -3840,7 +3840,7 @@ describe('GitGraphView', () => {
       it('Should reset the current branch to a commit', async () => {
         // Setup
         const resetToCommitResolvedValue = null;
-        const spyOnResetToCommit = jest.spyOn(dataSource, 'resetToCommit');
+        const spyOnResetToCommit = vi.spyOn(dataSource, 'resetToCommit');
         spyOnResetToCommit.mockResolvedValueOnce(resetToCommitResolvedValue);
 
         // Run
@@ -3872,7 +3872,7 @@ describe('GitGraphView', () => {
       it('Should revert a commit', async () => {
         // Setup
         const revertCommitResolvedValue = null;
-        const spyOnRevertCommit = jest.spyOn(dataSource, 'revertCommit');
+        const spyOnRevertCommit = vi.spyOn(dataSource, 'revertCommit');
         spyOnRevertCommit.mockResolvedValueOnce(revertCommitResolvedValue);
 
         // Run
@@ -3909,7 +3909,7 @@ describe('GitGraphView', () => {
           pushTagSkipRemoteCheck: false
         };
         const setGlobalViewStateResolvedValue = null;
-        const spyOnSetGlobalViewState = jest.spyOn(extensionState, 'setGlobalViewState');
+        const spyOnSetGlobalViewState = vi.spyOn(extensionState, 'setGlobalViewState');
         spyOnSetGlobalViewState.mockResolvedValueOnce(setGlobalViewStateResolvedValue);
 
         // Run
@@ -3935,7 +3935,7 @@ describe('GitGraphView', () => {
       it('Should set the Repository State', async () => {
         // Setup
         const repoState = mockRepoState();
-        const spyOnSetRepoState = jest.spyOn(repoManager, 'setRepoState');
+        const spyOnSetRepoState = vi.spyOn(repoManager, 'setRepoState');
         spyOnSetRepoState.mockImplementationOnce(() => {});
 
         // Run
@@ -3962,7 +3962,7 @@ describe('GitGraphView', () => {
           findOpenCommitDetailsView: true
         };
         const setWorkspaceViewStateResolvedValue = null;
-        const spyOnSetWorkspaceViewState = jest.spyOn(extensionState, 'setWorkspaceViewState');
+        const spyOnSetWorkspaceViewState = vi.spyOn(extensionState, 'setWorkspaceViewState');
         spyOnSetWorkspaceViewState.mockResolvedValueOnce(setWorkspaceViewStateResolvedValue);
 
         // Run
@@ -3987,7 +3987,7 @@ describe('GitGraphView', () => {
     describe('showErrorMessage', () => {
       it('Should show a Visual Studio Code Error Message', async () => {
         // Setup
-        const spyOnShowErrorMessage = jest.spyOn(utils, 'showErrorMessage');
+        const spyOnShowErrorMessage = vi.spyOn(utils, 'showErrorMessage');
         spyOnShowErrorMessage.mockResolvedValueOnce();
 
         // Run
@@ -4016,7 +4016,7 @@ describe('GitGraphView', () => {
           },
           error: null
         };
-        const spyOnStartCodeReview = jest.spyOn(extensionState, 'startCodeReview');
+        const spyOnStartCodeReview = vi.spyOn(extensionState, 'startCodeReview');
         spyOnStartCodeReview.mockResolvedValueOnce(startCodeReviewResolvedValue);
 
         // Run
@@ -4055,7 +4055,7 @@ describe('GitGraphView', () => {
       it("Should get a tag's details", async () => {
         // Setup
         const getTagDetailsResolvedValue = { details: null, error: null };
-        const spyOnGetTagDetails = jest.spyOn(dataSource, 'getTagDetails');
+        const spyOnGetTagDetails = vi.spyOn(dataSource, 'getTagDetails');
         spyOnGetTagDetails.mockResolvedValueOnce(getTagDetailsResolvedValue);
 
         // Run
@@ -4086,7 +4086,7 @@ describe('GitGraphView', () => {
       it('Should update a code review', async () => {
         // Setup
         const updateCodeReviewResolvedValue = null;
-        const spyOnUpdateCodeReview = jest.spyOn(extensionState, 'updateCodeReview');
+        const spyOnUpdateCodeReview = vi.spyOn(extensionState, 'updateCodeReview');
         spyOnUpdateCodeReview.mockResolvedValueOnce(updateCodeReviewResolvedValue);
 
         // Run
@@ -4120,7 +4120,7 @@ describe('GitGraphView', () => {
       it('Should open a diff', async () => {
         // Setup
         const viewDiffResolvedValue = null;
-        const spyOnViewDiff = jest.spyOn(utils, 'viewDiff');
+        const spyOnViewDiff = vi.spyOn(utils, 'viewDiff');
         spyOnViewDiff.mockResolvedValueOnce(viewDiffResolvedValue);
 
         // Run
@@ -4158,7 +4158,7 @@ describe('GitGraphView', () => {
       it('Should open a diff with the working file', async () => {
         // Setup
         const viewDiffWithWorkingFileResolvedValue = null;
-        const spyOnViewDiffWithWorkingFile = jest.spyOn(utils, 'viewDiffWithWorkingFile');
+        const spyOnViewDiffWithWorkingFile = vi.spyOn(utils, 'viewDiffWithWorkingFile');
         spyOnViewDiffWithWorkingFile.mockResolvedValueOnce(viewDiffWithWorkingFileResolvedValue);
 
         // Run
@@ -4191,7 +4191,7 @@ describe('GitGraphView', () => {
       it('Should view a file at a revision', async () => {
         // Setup
         const viewFileAtRevisionResolvedValue = null;
-        const spyOnViewFileAtRevision = jest.spyOn(utils, 'viewFileAtRevision');
+        const spyOnViewFileAtRevision = vi.spyOn(utils, 'viewFileAtRevision');
         spyOnViewFileAtRevision.mockResolvedValueOnce(viewFileAtRevisionResolvedValue);
 
         // Run
@@ -4223,7 +4223,7 @@ describe('GitGraphView', () => {
       it('Should open the Visual Studio Code Source Control View', async () => {
         // Setup
         const viewScmResolvedValue = null;
-        const spyOnViewScm = jest.spyOn(utils, 'viewScm');
+        const spyOnViewScm = vi.spyOn(utils, 'viewScm');
         spyOnViewScm.mockResolvedValueOnce(viewScmResolvedValue);
 
         // Run
@@ -4263,8 +4263,8 @@ describe('GitGraphView', () => {
     it('Should send a message to the Webview', async () => {
       // Setup
       const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
-      jest.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
-      jest.spyOn(mockedWebviewPanel.panel.webview, 'postMessage').mockResolvedValueOnce(true);
+      vi.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
+      vi.spyOn(mockedWebviewPanel.panel.webview, 'postMessage').mockResolvedValueOnce(true);
 
       // Run
       mockedWebviewPanel.mocks.panel.webview.onDidReceiveMessage({
@@ -4285,8 +4285,8 @@ describe('GitGraphView', () => {
     it("Should log an error message when Webview.postMessage rejects, and the GitGraphView hasn't been disposed", async () => {
       // Setup
       const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
-      jest.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
-      jest.spyOn(mockedWebviewPanel.panel.webview, 'postMessage').mockRejectedValueOnce(null);
+      vi.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
+      vi.spyOn(mockedWebviewPanel.panel.webview, 'postMessage').mockRejectedValueOnce(null);
 
       // Run
       mockedWebviewPanel.mocks.panel.webview.onDidReceiveMessage({
@@ -4309,8 +4309,8 @@ describe('GitGraphView', () => {
     it('Should log an information message when Webview.postMessage rejects, and the GitGraphView has been disposed', async () => {
       // Setup
       const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
-      jest.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
-      jest.spyOn(mockedWebviewPanel.panel.webview, 'postMessage').mockImplementationOnce(() => {
+      vi.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
+      vi.spyOn(mockedWebviewPanel.panel.webview, 'postMessage').mockImplementationOnce(() => {
         GitGraphView.currentPanel!.dispose();
         return Promise.reject();
       });
@@ -4336,8 +4336,8 @@ describe('GitGraphView', () => {
     it("Shouldn't send a message to the Webview if it has been disposed", async () => {
       // Setup
       const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
-      jest.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
-      jest.spyOn(mockedWebviewPanel.panel.webview, 'postMessage').mockResolvedValueOnce(true);
+      vi.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
+      vi.spyOn(mockedWebviewPanel.panel.webview, 'postMessage').mockResolvedValueOnce(true);
 
       // Run
       GitGraphView.currentPanel!.dispose();
@@ -4358,7 +4358,7 @@ describe('GitGraphView', () => {
 
   describe('getHtmlForWebview', () => {
     beforeEach(() => {
-      jest.spyOn(utils, 'getNonce').mockReturnValueOnce('1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d');
+      vi.spyOn(utils, 'getNonce').mockReturnValueOnce('1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d');
     });
     afterEach(() => {
       // Assert
@@ -4371,7 +4371,7 @@ describe('GitGraphView', () => {
       );
       expect(mockedWebviewPanel.panel.webview.html).toContain('<title>Git Graph</title>');
       expect(mockedWebviewPanel.panel.webview.html).toContain(
-        '<style>body{--git-graph-color0:#0085d9; --git-graph-color1:#d9008f; --git-graph-color2:#00d90a; --git-graph-color3:#d98500; --git-graph-color4:#a300d9; --git-graph-color5:#ff0000; --git-graph-color6:#00d9cc; --git-graph-color7:#e138e8; --git-graph-color8:#85d900; --git-graph-color9:#dc5b23; --git-graph-color10:#6f24d6; --git-graph-color11:#ffcc00; } [data-color=\"0\"]{--git-graph-color:var(--git-graph-color0);} [data-color=\"1\"]{--git-graph-color:var(--git-graph-color1);} [data-color=\"2\"]{--git-graph-color:var(--git-graph-color2);} [data-color=\"3\"]{--git-graph-color:var(--git-graph-color3);} [data-color=\"4\"]{--git-graph-color:var(--git-graph-color4);} [data-color=\"5\"]{--git-graph-color:var(--git-graph-color5);} [data-color=\"6\"]{--git-graph-color:var(--git-graph-color6);} [data-color=\"7\"]{--git-graph-color:var(--git-graph-color7);} [data-color=\"8\"]{--git-graph-color:var(--git-graph-color8);} [data-color=\"9\"]{--git-graph-color:var(--git-graph-color9);} [data-color=\"10\"]{--git-graph-color:var(--git-graph-color10);} [data-color=\"11\"]{--git-graph-color:var(--git-graph-color11);} </style>'
+        '<style>body{--git-graph-color0:#0085d9; --git-graph-color1:#d9008f; --git-graph-color2:#00d90a; --git-graph-color3:#d98500; --git-graph-color4:#a300d9; --git-graph-color5:#ff0000; --git-graph-color6:#00d9cc; --git-graph-color7:#e138e8; --git-graph-color8:#85d900; --git-graph-color9:#dc5b23; --git-graph-color10:#6f24d6; --git-graph-color11:#ffcc00; } [data-color="0"]{--git-graph-color:var(--git-graph-color0);} [data-color="1"]{--git-graph-color:var(--git-graph-color1);} [data-color="2"]{--git-graph-color:var(--git-graph-color2);} [data-color="3"]{--git-graph-color:var(--git-graph-color3);} [data-color="4"]{--git-graph-color:var(--git-graph-color4);} [data-color="5"]{--git-graph-color:var(--git-graph-color5);} [data-color="6"]{--git-graph-color:var(--git-graph-color6);} [data-color="7"]{--git-graph-color:var(--git-graph-color7);} [data-color="8"]{--git-graph-color:var(--git-graph-color8);} [data-color="9"]{--git-graph-color:var(--git-graph-color9);} [data-color="10"]{--git-graph-color:var(--git-graph-color10);} [data-color="11"]{--git-graph-color:var(--git-graph-color11);} </style>'
       );
     });
 
@@ -4424,7 +4424,7 @@ describe('GitGraphView', () => {
 
     it('Should get HTML when repositories exist', () => {
       // Setup
-      const spyOnIsAvatarStorageAvailable = jest.spyOn(extensionState, 'isAvatarStorageAvailable');
+      const spyOnIsAvatarStorageAvailable = vi.spyOn(extensionState, 'isAvatarStorageAvailable');
       vscode.mockExtensionSettingReturnValue('repository.commits.fetchAvatars', false);
 
       // Run
@@ -4452,7 +4452,7 @@ describe('GitGraphView', () => {
 
     it('Should get HTML when repositories exist (fetch avatars enabled)', () => {
       // Setup
-      const spyOnIsAvatarStorageAvailable = jest.spyOn(extensionState, 'isAvatarStorageAvailable');
+      const spyOnIsAvatarStorageAvailable = vi.spyOn(extensionState, 'isAvatarStorageAvailable');
       vscode.mockExtensionSettingReturnValue('repository.commits.fetchAvatars', true);
 
       // Run

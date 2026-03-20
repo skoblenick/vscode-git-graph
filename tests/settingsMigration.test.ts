@@ -1,5 +1,4 @@
 import * as vscode from './mocks/vscode';
-jest.mock('vscode', () => vscode, { virtual: true });
 
 import { migrateDeprecatedSettings } from '../src/settingsMigration';
 
@@ -144,7 +143,7 @@ describe('migrateDeprecatedSettings', () => {
       true
     );
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     extensionContext.globalState.get.mockReturnValue(true);
 
     await migrateDeprecatedSettings(extensionContext);

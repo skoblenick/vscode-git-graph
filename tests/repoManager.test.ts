@@ -1,11 +1,15 @@
 import './mocks/date';
 import * as vscode from './mocks/vscode';
-jest.mock('vscode', () => vscode, { virtual: true });
-jest.mock('fs');
-jest.mock('../src/dataSource');
-jest.mock('../src/extensionState');
-jest.mock('../src/logger');
-jest.mock('../src/utils/bufferedQueue');
+
+const actualBufferedQueue = await vi.importActual<typeof import('../src/utils/bufferedQueue')>(
+  '../src/utils/bufferedQueue'
+);
+
+vi.mock('fs');
+vi.mock('../src/dataSource');
+vi.mock('../src/extensionState');
+vi.mock('../src/logger');
+vi.mock('../src/utils/bufferedQueue');
 
 import * as fs from 'fs';
 import { ConfigurationChangeEvent } from 'vscode';
@@ -33,19 +37,19 @@ let onDidChangeGitExecutable: EventEmitter<utils.GitExecutable>;
 let logger: Logger;
 let dataSource: DataSource;
 let extensionState: ExtensionState;
-let spyOnGetRepos: jest.SpyInstance,
-  spyOnGetIgnoredRepos: jest.SpyInstance,
-  spyOnSetIgnoredRepos: jest.SpyInstance,
-  spyOnSaveRepos: jest.SpyInstance,
-  spyOnTransferRepo: jest.SpyInstance,
-  spyOnRepoRoot: jest.SpyInstance,
-  spyOnGetSubmodules: jest.SpyInstance,
-  spyOnLog: jest.SpyInstance,
-  spyOnMkdir: jest.SpyInstance,
-  spyOnReaddir: jest.SpyInstance,
-  spyOnReadFile: jest.SpyInstance,
-  spyOnStat: jest.SpyInstance,
-  spyOnWriteFile: jest.SpyInstance;
+let spyOnGetRepos: MockInstance,
+  spyOnGetIgnoredRepos: MockInstance,
+  spyOnSetIgnoredRepos: MockInstance,
+  spyOnSaveRepos: MockInstance,
+  spyOnTransferRepo: MockInstance,
+  spyOnRepoRoot: MockInstance,
+  spyOnGetSubmodules: MockInstance,
+  spyOnLog: MockInstance,
+  spyOnMkdir: MockInstance,
+  spyOnReaddir: MockInstance,
+  spyOnReadFile: MockInstance,
+  spyOnStat: MockInstance,
+  spyOnWriteFile: MockInstance;
 
 beforeAll(() => {
   onDidChangeConfiguration = new EventEmitter<ConfigurationChangeEvent>();
@@ -61,19 +65,19 @@ beforeAll(() => {
     vscode.mocks.extensionContext,
     onDidChangeGitExecutable.subscribe
   );
-  spyOnGetRepos = jest.spyOn(extensionState, 'getRepos');
-  spyOnGetIgnoredRepos = jest.spyOn(extensionState, 'getIgnoredRepos');
-  spyOnSetIgnoredRepos = jest.spyOn(extensionState, 'setIgnoredRepos');
-  spyOnSaveRepos = jest.spyOn(extensionState, 'saveRepos');
-  spyOnTransferRepo = jest.spyOn(extensionState, 'transferRepo');
-  spyOnRepoRoot = jest.spyOn(dataSource, 'repoRoot');
-  spyOnGetSubmodules = jest.spyOn(dataSource, 'getSubmodules');
-  spyOnLog = jest.spyOn(logger, 'log');
-  spyOnMkdir = jest.spyOn(fs, 'mkdir');
-  spyOnReaddir = jest.spyOn(fs, 'readdir');
-  spyOnReadFile = jest.spyOn(fs, 'readFile');
-  spyOnStat = jest.spyOn(fs, 'stat');
-  spyOnWriteFile = jest.spyOn(fs, 'writeFile');
+  spyOnGetRepos = vi.spyOn(extensionState, 'getRepos');
+  spyOnGetIgnoredRepos = vi.spyOn(extensionState, 'getIgnoredRepos');
+  spyOnSetIgnoredRepos = vi.spyOn(extensionState, 'setIgnoredRepos');
+  spyOnSaveRepos = vi.spyOn(extensionState, 'saveRepos');
+  spyOnTransferRepo = vi.spyOn(extensionState, 'transferRepo');
+  spyOnRepoRoot = vi.spyOn(dataSource, 'repoRoot');
+  spyOnGetSubmodules = vi.spyOn(dataSource, 'getSubmodules');
+  spyOnLog = vi.spyOn(logger, 'log');
+  spyOnMkdir = vi.spyOn(fs, 'mkdir');
+  spyOnReaddir = vi.spyOn(fs, 'readdir');
+  spyOnReadFile = vi.spyOn(fs, 'readFile');
+  spyOnStat = vi.spyOn(fs, 'stat');
+  spyOnWriteFile = vi.spyOn(fs, 'writeFile');
 
   spyOnReadFile.mockImplementation(
     (_: string, callback: (err: NodeJS.ErrnoException | null, data: Buffer) => void) => {
@@ -81,12 +85,13 @@ beforeAll(() => {
     }
   );
 
-  jest
-    .spyOn(bufferedQueue, 'BufferedQueue')
-    .mockImplementation(<T>(onItem: (item: T) => Promise<boolean>, onChanges: () => void) => {
-      const realBufferedQueue = jest.requireActual('../src/utils/bufferedQueue');
-      return new realBufferedQueue.BufferedQueue(onItem, onChanges, 1);
-    });
+  vi.spyOn(bufferedQueue, 'BufferedQueue').mockImplementation(function <T>(
+    this: any,
+    onItem: (item: T) => Promise<boolean>,
+    onChanges: () => void
+  ) {
+    return new actualBufferedQueue.BufferedQueue(onItem, onChanges, 1);
+  } as any);
 });
 
 afterAll(() => {
@@ -124,7 +129,7 @@ describe('RepoManager', () => {
       }) => Promise<void>;
       vscode.workspace.onDidChangeWorkspaceFolders.mockImplementationOnce((listener) => {
         emitOnDidChangeWorkspaceFolders = listener as () => Promise<void>;
-        return { dispose: jest.fn() };
+        return { dispose: vi.fn() };
       });
       const repoManager = await constructRepoManagerAndWaitUntilStarted([], []);
 
@@ -171,7 +176,7 @@ describe('RepoManager', () => {
       }) => Promise<void>;
       vscode.workspace.onDidChangeWorkspaceFolders.mockImplementationOnce((listener) => {
         emitOnDidChangeWorkspaceFolders = listener as () => Promise<void>;
-        return { dispose: jest.fn() };
+        return { dispose: vi.fn() };
       });
       const repoManager = await constructRepoManagerAndWaitUntilStarted([], []);
 
@@ -215,7 +220,7 @@ describe('RepoManager', () => {
       }) => Promise<void>;
       vscode.workspace.onDidChangeWorkspaceFolders.mockImplementationOnce((listener) => {
         emitOnDidChangeWorkspaceFolders = listener as () => Promise<void>;
-        return { dispose: jest.fn() };
+        return { dispose: vi.fn() };
       });
       const repoManager = await constructRepoManagerAndWaitUntilStarted([], []);
 
@@ -248,7 +253,7 @@ describe('RepoManager', () => {
       }) => Promise<void>;
       vscode.workspace.onDidChangeWorkspaceFolders.mockImplementationOnce((listener) => {
         emitOnDidChangeWorkspaceFolders = listener as () => Promise<void>;
-        return { dispose: jest.fn() };
+        return { dispose: vi.fn() };
       });
       const repoManager = await constructRepoManagerAndWaitUntilStarted(
         ['/path/to/workspace-folder1', '/path/to/workspace-folder2'],
@@ -297,7 +302,7 @@ describe('RepoManager', () => {
       }) => Promise<void>;
       vscode.workspace.onDidChangeWorkspaceFolders.mockImplementationOnce((listener) => {
         emitOnDidChangeWorkspaceFolders = listener as () => Promise<void>;
-        return { dispose: jest.fn() };
+        return { dispose: vi.fn() };
       });
       const repoManager = await constructRepoManagerAndWaitUntilStarted(
         ['/path/to/workspace-folder1', '/path/to/workspace-folder2'],
@@ -334,7 +339,7 @@ describe('RepoManager', () => {
       }) => Promise<void>;
       vscode.workspace.onDidChangeWorkspaceFolders.mockImplementationOnce((listener) => {
         emitOnDidChangeWorkspaceFolders = listener as () => Promise<void>;
-        return { dispose: jest.fn() };
+        return { dispose: vi.fn() };
       });
       const repoManager = await constructRepoManagerAndWaitUntilStarted(
         ['/path/to/workspace-folder1', '/path/to/workspace-folder2', '/path/to/workspace-folder3'],
@@ -396,7 +401,7 @@ describe('RepoManager', () => {
       }) => Promise<void>;
       vscode.workspace.onDidChangeWorkspaceFolders.mockImplementationOnce((listener) => {
         emitOnDidChangeWorkspaceFolders = listener as () => Promise<void>;
-        return { dispose: jest.fn() };
+        return { dispose: vi.fn() };
       });
       const repoManager = await constructRepoManagerAndWaitUntilStarted(
         ['/path/to/workspace-folder1', '/path/to/workspace-folder2'],
@@ -430,7 +435,7 @@ describe('RepoManager', () => {
         []
       );
 
-      const spyOnSearchWorkspaceForRepos = jest.spyOn(repoManager, 'searchWorkspaceForRepos');
+      const spyOnSearchWorkspaceForRepos = vi.spyOn(repoManager, 'searchWorkspaceForRepos');
 
       // Run
       vscode.mockExtensionSettingReturnValue('maxDepthOfRepoSearch', 0);
@@ -453,7 +458,7 @@ describe('RepoManager', () => {
         []
       );
 
-      const spyOnSearchWorkspaceForRepos = jest.spyOn(repoManager, 'searchWorkspaceForRepos');
+      const spyOnSearchWorkspaceForRepos = vi.spyOn(repoManager, 'searchWorkspaceForRepos');
 
       // Run
       onDidChangeConfiguration.emit({
@@ -1124,7 +1129,7 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1/sym-repo1', '/path/to/workspace-folder1/sym-repo2']
       );
 
-      const spyOnRealPath = jest.spyOn(utils, 'realpath');
+      const spyOnRealPath = vi.spyOn(utils, 'realpath');
       spyOnRealPath.mockResolvedValueOnce('/path/to/workspace-folder1/repo2');
       spyOnRealPath.mockResolvedValueOnce('/path/to/workspace-folder1/repo1');
       spyOnRealPath.mockResolvedValueOnce('/path/to/workspace-folder1/repo2');
@@ -1149,7 +1154,7 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1/repo1', '/path/to/workspace-folder1/repo2']
       );
 
-      const spyOnRealPath = jest.spyOn(utils, 'realpath');
+      const spyOnRealPath = vi.spyOn(utils, 'realpath');
       spyOnRealPath.mockResolvedValueOnce('/path/to/workspace-folder1/repo3');
       spyOnRealPath.mockResolvedValueOnce('/path/to/workspace-folder1/repo1');
       spyOnRealPath.mockResolvedValueOnce('/path/to/workspace-folder1/repo2');
@@ -1714,7 +1719,7 @@ describe('RepoManager', () => {
     let repoManager: RepoManager;
     let emitOnDidCreate: (e: vscode.Uri) => any;
     let onDidChangeReposEvents: RepoChangeEvent[];
-    let spyOnEnqueue: jest.SpyInstance;
+    let spyOnEnqueue: MockInstance;
 
     beforeEach(async () => {
       mockDirectoryThatsNotRepository();
@@ -1722,13 +1727,13 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1'],
         []
       );
-      emitOnDidCreate = (<jest.Mock<any, any>>(
+      emitOnDidCreate = (<Mock<any, any>>(
         repoManager['folderWatchers']['/path/to/workspace-folder1'].onDidCreate
       )).mock.calls[0][0];
       onDidChangeReposEvents = [];
       repoManager.onDidChangeRepos((event) => onDidChangeReposEvents.push(event));
 
-      spyOnEnqueue = jest.spyOn(repoManager['onWatcherCreateQueue'], 'enqueue');
+      spyOnEnqueue = vi.spyOn(repoManager['onWatcherCreateQueue'], 'enqueue');
     });
 
     afterEach(() => {
@@ -1857,7 +1862,7 @@ describe('RepoManager', () => {
     let repoManager: RepoManager;
     let emitOnDidChange: (e: vscode.Uri) => any;
     let onDidChangeReposEvents: RepoChangeEvent[];
-    let spyOnEnqueue: jest.SpyInstance;
+    let spyOnEnqueue: MockInstance;
 
     beforeEach(async () => {
       mockRepositoryWithNoSubmodules();
@@ -1867,13 +1872,13 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1/repo']
       );
 
-      emitOnDidChange = (<jest.Mock<any, any>>(
+      emitOnDidChange = (<Mock<any, any>>(
         repoManager['folderWatchers']['/path/to/workspace-folder1'].onDidChange
       )).mock.calls[0][0];
       onDidChangeReposEvents = [];
       repoManager.onDidChangeRepos((event) => onDidChangeReposEvents.push(event));
 
-      spyOnEnqueue = jest.spyOn(repoManager['onWatcherChangeQueue'], 'enqueue');
+      spyOnEnqueue = vi.spyOn(repoManager['onWatcherChangeQueue'], 'enqueue');
     });
 
     afterEach(() => {
@@ -2007,7 +2012,7 @@ describe('RepoManager', () => {
         ]
       );
 
-      const emitOnDidDelete = (<jest.Mock<any, any>>(
+      const emitOnDidDelete = (<Mock<any, any>>(
         repoManager['folderWatchers']['/path/to/workspace-folder1'].onDidDelete
       )).mock.calls[0][0];
       const onDidChangeReposEvents: RepoChangeEvent[] = [];
@@ -2051,7 +2056,7 @@ describe('RepoManager', () => {
         ]
       );
 
-      const emitOnDidDelete = (<jest.Mock<any, any>>(
+      const emitOnDidDelete = (<Mock<any, any>>(
         repoManager['folderWatchers']['/path/to/workspace-folder1'].onDidDelete
       )).mock.calls[0][0];
       const onDidChangeReposEvents: RepoChangeEvent[] = [];
@@ -2095,7 +2100,7 @@ describe('RepoManager', () => {
         ] // Not realistic, this is used to observe the control flow for this test case
       );
 
-      const emitOnDidDelete = (<jest.Mock<any, any>>(
+      const emitOnDidDelete = (<Mock<any, any>>(
         repoManager['folderWatchers']['/path/to/workspace-folder1'].onDidDelete
       )).mock.calls[0][0];
       const onDidChangeReposEvents: RepoChangeEvent[] = [];
@@ -2129,7 +2134,7 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1/repo1']
       );
 
-      const emitOnDidDelete = (<jest.Mock<any, any>>(
+      const emitOnDidDelete = (<Mock<any, any>>(
         repoManager['folderWatchers']['/path/to/workspace-folder1'].onDidDelete
       )).mock.calls[0][0];
       const onDidChangeReposEvents: RepoChangeEvent[] = [];
@@ -2816,7 +2821,7 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1'],
         []
       );
-      const spyOnIsKnownRepo = jest.spyOn(repoManager, 'isKnownRepo');
+      const spyOnIsKnownRepo = vi.spyOn(repoManager, 'isKnownRepo');
       mockRepositoryWithNoSubmodules();
       mockFsReadFileOnce(null, '{');
 
@@ -2840,7 +2845,7 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1'],
         []
       );
-      const spyOnIsKnownRepo = jest.spyOn(repoManager, 'isKnownRepo');
+      const spyOnIsKnownRepo = vi.spyOn(repoManager, 'isKnownRepo');
       mockRepositoryWithNoSubmodules();
       mockFsReadFileOnce(null, 'true');
 
@@ -2867,9 +2872,9 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1'],
         ['/path/to/workspace-folder1/repo1']
       );
-      const emitOnDidCreate = (<jest.Mock<any, any>>repoManager['configWatcher'].onDidCreate).mock
+      const emitOnDidCreate = (<Mock<any, any>>repoManager['configWatcher'].onDidCreate).mock
         .calls[0][0];
-      const spyOnBufferedQueueEnqueue = jest.spyOn(repoManager['checkRepoConfigQueue'], 'enqueue');
+      const spyOnBufferedQueueEnqueue = vi.spyOn(repoManager['checkRepoConfigQueue'], 'enqueue');
       mockFsReadFileOnce(null, {
         showTags: true,
         exportedAt: 1587559258000
@@ -2906,9 +2911,9 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1/repo1']
       );
       repoManager['repos']['/path/to/workspace-folder1/repo1'].name = 'Old Name';
-      const emitOnDidChange = (<jest.Mock<any, any>>repoManager['configWatcher'].onDidChange).mock
+      const emitOnDidChange = (<Mock<any, any>>repoManager['configWatcher'].onDidChange).mock
         .calls[0][0];
-      const spyOnBufferedQueueEnqueue = jest.spyOn(repoManager['checkRepoConfigQueue'], 'enqueue');
+      const spyOnBufferedQueueEnqueue = vi.spyOn(repoManager['checkRepoConfigQueue'], 'enqueue');
       mockFsReadFileOnce(null, {
         name: 'Name',
         exportedAt: 1587559258000
@@ -2944,9 +2949,9 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1'],
         ['/path/to/workspace-folder1/repo1']
       );
-      const emitOnDidChange = (<jest.Mock<any, any>>repoManager['configWatcher'].onDidChange).mock
+      const emitOnDidChange = (<Mock<any, any>>repoManager['configWatcher'].onDidChange).mock
         .calls[0][0];
-      const spyOnIsKnownRepo = jest.spyOn(repoManager, 'isKnownRepo');
+      const spyOnIsKnownRepo = vi.spyOn(repoManager, 'isKnownRepo');
       mockFsReadFileOnce(null, {
         name: 'Name',
         exportedAt: 1587559258000
@@ -2977,9 +2982,9 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1'],
         ['/path/to/workspace-folder1/repo1']
       );
-      const emitOnDidChange = (<jest.Mock<any, any>>repoManager['configWatcher'].onDidChange).mock
+      const emitOnDidChange = (<Mock<any, any>>repoManager['configWatcher'].onDidChange).mock
         .calls[0][0];
-      const spyOnIsKnownRepo = jest.spyOn(repoManager, 'isKnownRepo');
+      const spyOnIsKnownRepo = vi.spyOn(repoManager, 'isKnownRepo');
       mockFsReadFileOnce(null, {
         name: 'Name',
         exportedAt: 1587559258000
@@ -3008,9 +3013,9 @@ describe('RepoManager', () => {
         ['/path/to/workspace-folder1/repo1']
       );
       repoManager['repos']['/path/to/workspace-folder1/repo1'].name = 'Old Name';
-      const emitOnDidChange = (<jest.Mock<any, any>>repoManager['configWatcher'].onDidChange).mock
+      const emitOnDidChange = (<Mock<any, any>>repoManager['configWatcher'].onDidChange).mock
         .calls[0][0];
-      const spyOnBufferedQueueEnqueue = jest.spyOn(repoManager['checkRepoConfigQueue'], 'enqueue');
+      const spyOnBufferedQueueEnqueue = vi.spyOn(repoManager['checkRepoConfigQueue'], 'enqueue');
 
       // Run
       emitOnDidChange(

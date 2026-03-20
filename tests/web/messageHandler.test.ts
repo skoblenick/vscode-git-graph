@@ -1,4 +1,4 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 import * as vm from 'vm';
 import { createWebContext, loadWebFiles } from './webviewTestHelper';
 
@@ -7,15 +7,15 @@ function setupContext() {
   const { ctx, sandbox } = webCtx;
 
   sandbox.dialog = {
-    showError: jest.fn(),
-    showConfirmation: jest.fn(),
-    showForm: jest.fn(),
-    closeActionRunning: jest.fn()
+    showError: vi.fn(),
+    showConfirmation: vi.fn(),
+    showForm: vi.fn(),
+    closeActionRunning: vi.fn()
   };
-  sandbox.contextMenu = { close: jest.fn() };
-  sandbox.runAction = jest.fn();
-  sandbox.sendMessage = jest.fn();
-  sandbox.updateGlobalViewState = jest.fn();
+  sandbox.contextMenu = { close: vi.fn() };
+  sandbox.runAction = vi.fn();
+  sandbox.sendMessage = vi.fn();
+  sandbox.updateGlobalViewState = vi.fn();
 
   sandbox.TargetType = { Commit: 'commit', CommitDetailsView: 'cdv', Ref: 'ref', Repo: 'repo' };
   sandbox.DialogInputType = { Text: 0, TextRef: 1, Select: 2, Radio: 3, Checkbox: 4 };
@@ -27,25 +27,25 @@ function setupContext() {
   loadWebFiles(ctx, ['utils.ts', 'fileTree.ts', 'messageHandler.ts']);
 
   sandbox.mockGitGraph = {
-    refresh: jest.fn(),
-    requestLoadConfig: jest.fn(),
-    processLoadCommitsResponse: jest.fn(),
-    processLoadConfig: jest.fn(),
-    processLoadRepoInfoResponse: jest.fn(),
-    loadRepos: jest.fn(),
-    showCommitDetails: jest.fn(),
-    closeCommitDetails: jest.fn(),
-    showCommitComparison: jest.fn(),
-    closeCommitComparison: jest.fn(),
-    loadAvatar: jest.fn(),
-    getCurrentRepo: jest.fn().mockReturnValue('/repo'),
-    getGitRepos: jest.fn().mockReturnValue({}),
-    startCodeReview: jest.fn(),
-    renderTagDetails: jest.fn(),
-    endCodeReview: jest.fn()
+    refresh: vi.fn(),
+    requestLoadConfig: vi.fn(),
+    processLoadCommitsResponse: vi.fn(),
+    processLoadConfig: vi.fn(),
+    processLoadRepoInfoResponse: vi.fn(),
+    loadRepos: vi.fn(),
+    showCommitDetails: vi.fn(),
+    closeCommitDetails: vi.fn(),
+    showCommitComparison: vi.fn(),
+    closeCommitComparison: vi.fn(),
+    loadAvatar: vi.fn(),
+    getCurrentRepo: vi.fn().mockReturnValue('/repo'),
+    getGitRepos: vi.fn().mockReturnValue({}),
+    startCodeReview: vi.fn(),
+    renderTagDetails: vi.fn(),
+    endCodeReview: vi.fn()
   };
   sandbox.mockImageResizer = {
-    resize: jest.fn((img: string, cb: (resized: string) => void) => cb(img))
+    resize: vi.fn((img: string, cb: (resized: string) => void) => cb(img))
   };
 
   return webCtx;
@@ -1366,8 +1366,8 @@ describe('messageHandler', () => {
 
   describe('deleteBranch force-delete callback', () => {
     it('should call runAction with forceDelete when confirmation callback is invoked', () => {
-      sandbox.dialog.showConfirmation = jest.fn(
-        (_msg: string, _btn: string, callback: () => void) => callback()
+      sandbox.dialog.showConfirmation = vi.fn((_msg: string, _btn: string, callback: () => void) =>
+        callback()
       );
       vm.runInContext(
         'handleMessage(mockGitGraph, mockImageResizer, { command: "deleteBranch", repo: "/repo", branchName: "feature", deleteOnRemotes: [], errors: ["git branch -D"] })',

@@ -195,7 +195,7 @@ export function getExtensionVersion(extensionContext: vscode.ExtensionContext) {
       } else {
         try {
           resolve(JSON.parse(data.toString()).version);
-        } catch (_) {
+        } catch {
           reject();
         }
       }
@@ -397,7 +397,7 @@ export function openExternalUrl(url: string, type: string = 'External URL'): The
     return vscode.env
       .openExternal(vscode.Uri.parse(url))
       .then((success) => (success ? null : getErrorMessage()), getErrorMessage);
-  } catch (_) {
+  } catch {
     return Promise.resolve(getErrorMessage());
   }
 }
@@ -772,14 +772,14 @@ export async function findGit(extensionState: ExtensionState) {
   if (lastKnownPath !== null) {
     try {
       return await getGitExecutable(lastKnownPath);
-    } catch (_) {}
+    } catch {}
   }
 
   const configGitPaths = getConfig().gitPaths;
   if (configGitPaths.length > 0) {
     try {
       return await getGitExecutableFromPaths(configGitPaths);
-    } catch (_) {}
+    } catch {}
   }
 
   switch (process.platform) {
@@ -856,7 +856,7 @@ async function findGitWin32InPath() {
     if (await isExecutable(file)) {
       try {
         return await getGitExecutable(file);
-      } catch (_) {}
+      } catch {}
     }
   }
   return Promise.reject<GitExecutable>();
@@ -907,7 +907,7 @@ export async function getGitExecutableFromPaths(paths: string[]): Promise<GitExe
   for (let i = 0; i < paths.length; i++) {
     try {
       return await getGitExecutable(paths[i]);
-    } catch (_) {}
+    } catch {}
   }
   throw new Error('None of the provided paths are a Git executable');
 }

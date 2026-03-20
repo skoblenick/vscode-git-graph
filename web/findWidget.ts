@@ -225,7 +225,7 @@ class FindWidget {
         findGlobalPattern: RegExp | null;
       const regexText = workspaceState.findIsRegex
           ? this.text
-          : this.text.replace(/[\\\[\](){}|.*+?^$]/g, '\\$&'),
+          : this.text.replace(/[\\[\](){}|.*+?^$]/g, '\\$&'),
         flags = 'u' + (workspaceState.findIsCaseSensitive ? '' : 'i');
       try {
         findPattern = new RegExp(regexText, flags);

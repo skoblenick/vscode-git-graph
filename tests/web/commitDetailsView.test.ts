@@ -1,4 +1,4 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 import * as vm from 'vm';
 import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
@@ -29,13 +29,13 @@ function createMockView(ctx: vm.Context, overrides: Record<string, any> = {}) {
     getViewElem: () => ({ style: {}, scrollTop: 0, clientHeight: 600 }),
     getControlsElem: () => ({ clientHeight: 40 }),
     getNumColumns: () => 5,
-    renderGraph: jest.fn(),
-    closeCommitDetails: jest.fn(),
-    saveRepoState: jest.fn(),
-    saveState: jest.fn(),
-    endCodeReview: jest.fn(),
-    loadRepos: jest.fn(),
-    getBranchOptions: jest.fn()
+    renderGraph: vi.fn(),
+    closeCommitDetails: vi.fn(),
+    saveRepoState: vi.fn(),
+    saveState: vi.fn(),
+    endCodeReview: vi.fn(),
+    loadRepos: vi.fn(),
+    getBranchOptions: vi.fn()
   };
 
   return defaults;
@@ -51,22 +51,24 @@ describe('commitDetailsView', () => {
     sandbox = webCtx.sandbox;
 
     sandbox.dialog = {
-      showError: jest.fn(),
-      showConfirmation: jest.fn(),
-      showForm: jest.fn(),
-      closeActionRunning: jest.fn()
+      showError: vi.fn(),
+      showConfirmation: vi.fn(),
+      showForm: vi.fn(),
+      closeActionRunning: vi.fn()
     };
-    sandbox.contextMenu = { close: jest.fn(), show: jest.fn() };
-    sandbox.runAction = jest.fn();
-    sandbox.sendMessage = jest.fn();
-    sandbox.eventOverlay = { create: jest.fn(), remove: jest.fn() };
-    sandbox.addListenerToClass = jest.fn();
-    sandbox.observeElemScroll = jest.fn();
-    sandbox.insertAfter = jest.fn();
-    sandbox.insertBeforeFirstChildWithClass = jest.fn();
-    sandbox.TextFormatter = jest.fn().mockImplementation(() => ({ format: (s: string) => s }));
-    sandbox.generateSignatureHtml = jest.fn().mockReturnValue('');
-    sandbox.updateGlobalViewState = jest.fn();
+    sandbox.contextMenu = { close: vi.fn(), show: vi.fn() };
+    sandbox.runAction = vi.fn();
+    sandbox.sendMessage = vi.fn();
+    sandbox.eventOverlay = { create: vi.fn(), remove: vi.fn() };
+    sandbox.addListenerToClass = vi.fn();
+    sandbox.observeElemScroll = vi.fn();
+    sandbox.insertAfter = vi.fn();
+    sandbox.insertBeforeFirstChildWithClass = vi.fn();
+    sandbox.TextFormatter = vi.fn().mockImplementation(function () {
+      return { format: (s: string) => s };
+    });
+    sandbox.generateSignatureHtml = vi.fn().mockReturnValue('');
+    sandbox.updateGlobalViewState = vi.fn();
 
     loadWebFiles(ctx, ['utils.ts', 'fileTree.ts', 'commitDetailsView.ts']);
   });
@@ -217,26 +219,28 @@ describe('renderCommitDetailsView', () => {
     sandbox = webCtx.sandbox;
 
     sandbox.dialog = {
-      showError: jest.fn(),
-      showConfirmation: jest.fn(),
-      showForm: jest.fn(),
-      closeActionRunning: jest.fn()
+      showError: vi.fn(),
+      showConfirmation: vi.fn(),
+      showForm: vi.fn(),
+      closeActionRunning: vi.fn()
     };
-    sandbox.contextMenu = { close: jest.fn(), show: jest.fn() };
-    sandbox.runAction = jest.fn();
-    sandbox.sendMessage = jest.fn();
-    sandbox.eventOverlay = { create: jest.fn(), remove: jest.fn() };
-    sandbox.addListenerToClass = jest.fn();
-    sandbox.observeElemScroll = jest.fn();
-    sandbox.insertAfter = jest
+    sandbox.contextMenu = { close: vi.fn(), show: vi.fn() };
+    sandbox.runAction = vi.fn();
+    sandbox.sendMessage = vi.fn();
+    sandbox.eventOverlay = { create: vi.fn(), remove: vi.fn() };
+    sandbox.addListenerToClass = vi.fn();
+    sandbox.observeElemScroll = vi.fn();
+    sandbox.insertAfter = vi
       .fn()
       .mockImplementation((newNode: HTMLElement, refNode: HTMLElement) => {
         if (refNode.parentNode) refNode.parentNode.insertBefore(newNode, refNode.nextSibling);
       });
-    sandbox.insertBeforeFirstChildWithClass = jest.fn();
-    sandbox.TextFormatter = jest.fn().mockImplementation(() => ({ format: (s: string) => s }));
-    sandbox.generateSignatureHtml = jest.fn().mockReturnValue('');
-    sandbox.updateGlobalViewState = jest.fn();
+    sandbox.insertBeforeFirstChildWithClass = vi.fn();
+    sandbox.TextFormatter = vi.fn().mockImplementation(function () {
+      return { format: (s: string) => s };
+    });
+    sandbox.generateSignatureHtml = vi.fn().mockReturnValue('');
+    sandbox.updateGlobalViewState = vi.fn();
 
     loadWebFiles(ctx, [
       'utils.ts',
@@ -258,7 +262,7 @@ describe('renderCommitDetailsView', () => {
     viewElem.id = 'view';
     Object.defineProperty(viewElem, 'clientHeight', { value: 600, configurable: true });
     viewElem.scrollTop = 0;
-    viewElem.scroll = jest.fn();
+    viewElem.scroll = vi.fn();
     document.body.appendChild(viewElem);
 
     const controlsElem = document.createElement('div');
@@ -314,13 +318,13 @@ describe('renderCommitDetailsView', () => {
       getViewElem: () => viewElem,
       getControlsElem: () => controlsElem,
       getNumColumns: () => 5,
-      renderGraph: jest.fn(),
-      closeCommitDetails: jest.fn(),
-      saveRepoState: jest.fn(),
-      saveState: jest.fn(),
-      endCodeReview: jest.fn(),
-      loadRepos: jest.fn(),
-      getBranchOptions: jest.fn()
+      renderGraph: vi.fn(),
+      closeCommitDetails: vi.fn(),
+      saveRepoState: vi.fn(),
+      saveState: vi.fn(),
+      endCodeReview: vi.fn(),
+      loadRepos: vi.fn(),
+      getBranchOptions: vi.fn()
     };
 
     return { defaults, viewElem, controlsElem };
@@ -522,7 +526,7 @@ describe('renderCommitDetailsView', () => {
     commitElem.dataset.id = '0';
     document.body.appendChild(commitElem);
 
-    const { viewElem } = createCdvMockView({
+    createCdvMockView({
       expandedCommit: {
         commitHash: 'abc123',
         compareWithHash: null,

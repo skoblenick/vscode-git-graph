@@ -1,23 +1,31 @@
 import * as date from './mocks/date';
 import { mockSpyOnSpawn } from './mocks/spawn';
 import * as vscode from './mocks/vscode';
-jest.mock('vscode', () => vscode, { virtual: true });
-jest.mock('../src/dataSource');
-jest.mock('../src/extensionState');
-jest.mock('../src/logger');
 
-import * as fs from 'fs';
-const mockedFileSystemModule: any = {
-  access: jest.fn(),
-  constants: fs.constants,
-  readFile: jest.fn(),
-  realpath: jest.fn(),
-  stat: jest.fn()
-};
-mockedFileSystemModule.realpath['native'] = jest.fn();
-jest.doMock('fs', () => mockedFileSystemModule);
+vi.mock('child_process', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('child_process')>();
+  return { ...actual, spawn: vi.fn() };
+});
+vi.mock('../src/dataSource');
+vi.mock('../src/extensionState');
+vi.mock('../src/logger');
+
+const { mockedFileSystemModule } = vi.hoisted(() => {
+  const realpath: any = vi.fn();
+  realpath['native'] = vi.fn();
+  const mod: any = {
+    access: vi.fn(),
+    constants: { F_OK: 0, R_OK: 4, W_OK: 2, X_OK: 1 },
+    readFile: vi.fn(),
+    realpath,
+    stat: vi.fn()
+  };
+  return { mockedFileSystemModule: mod };
+});
+vi.mock('fs', () => mockedFileSystemModule);
 
 import * as cp from 'child_process';
+import * as fs from 'fs';
 import * as path from 'path';
 import { ConfigurationChangeEvent } from 'vscode';
 import { DataSource } from '../src/dataSource';
@@ -74,7 +82,7 @@ let onDidChangeConfiguration: EventEmitter<ConfigurationChangeEvent>;
 let onDidChangeGitExecutable: EventEmitter<GitExecutable>;
 let logger: Logger;
 let dataSource: DataSource;
-let spyOnSpawn: jest.SpyInstance;
+let spyOnSpawn: MockInstance;
 
 beforeAll(() => {
   onDidChangeConfiguration = new EventEmitter<ConfigurationChangeEvent>();
@@ -86,7 +94,7 @@ beforeAll(() => {
     onDidChangeGitExecutable.subscribe,
     logger
   );
-  spyOnSpawn = jest.spyOn(cp, 'spawn');
+  spyOnSpawn = vi.spyOn(cp, 'spawn');
 });
 
 afterAll(() => {
@@ -830,7 +838,7 @@ describe('archive', () => {
     vscode.window.showSaveDialog.mockResolvedValueOnce(
       vscode.Uri.file('/archive/file/destination.tar')
     );
-    const spyOnArchive = jest.spyOn(dataSource, 'archive');
+    const spyOnArchive = vi.spyOn(dataSource, 'archive');
     spyOnArchive.mockResolvedValueOnce(null);
 
     // Run
@@ -855,7 +863,7 @@ describe('archive', () => {
     vscode.window.showSaveDialog.mockResolvedValueOnce(
       vscode.Uri.file('/archive/file/destination.TAR')
     );
-    const spyOnArchive = jest.spyOn(dataSource, 'archive');
+    const spyOnArchive = vi.spyOn(dataSource, 'archive');
     spyOnArchive.mockResolvedValueOnce(null);
 
     // Run
@@ -880,7 +888,7 @@ describe('archive', () => {
     vscode.window.showSaveDialog.mockResolvedValueOnce(
       vscode.Uri.file('/archive/file/destination.zip')
     );
-    const spyOnArchive = jest.spyOn(dataSource, 'archive');
+    const spyOnArchive = vi.spyOn(dataSource, 'archive');
     spyOnArchive.mockResolvedValueOnce(null);
 
     // Run
@@ -905,7 +913,7 @@ describe('archive', () => {
     vscode.window.showSaveDialog.mockResolvedValueOnce(
       vscode.Uri.file('/archive/file/destination.ZIP')
     );
-    const spyOnArchive = jest.spyOn(dataSource, 'archive');
+    const spyOnArchive = vi.spyOn(dataSource, 'archive');
     spyOnArchive.mockResolvedValueOnce(null);
 
     // Run
@@ -1299,7 +1307,7 @@ describe('openExternalUrl', () => {
 
   it('Should return an error message if vscode was unable to parse the url', async () => {
     // Setup
-    const spyOnParse = jest.spyOn(vscode.Uri, 'parse');
+    const spyOnParse = vi.spyOn(vscode.Uri, 'parse');
     spyOnParse.mockImplementationOnce(() => {
       throw new Error();
     });
@@ -1417,7 +1425,7 @@ describe('openFile', () => {
       ) => callback(null)
     );
     vscode.commands.executeCommand.mockResolvedValueOnce(null);
-    const spyOnGetNewPathOfRenamedFile = jest.spyOn(dataSource, 'getNewPathOfRenamedFile');
+    const spyOnGetNewPathOfRenamedFile = vi.spyOn(dataSource, 'getNewPathOfRenamedFile');
     spyOnGetNewPathOfRenamedFile.mockResolvedValueOnce('renamed-new.txt');
 
     // Run
@@ -1513,7 +1521,7 @@ describe('openFile', () => {
         callback: (err: NodeJS.ErrnoException | null) => void
       ) => callback(new Error())
     );
-    const spyOnGetNewPathOfRenamedFile = jest.spyOn(dataSource, 'getNewPathOfRenamedFile');
+    const spyOnGetNewPathOfRenamedFile = vi.spyOn(dataSource, 'getNewPathOfRenamedFile');
     spyOnGetNewPathOfRenamedFile.mockResolvedValueOnce(null);
 
     // Run
@@ -1556,7 +1564,7 @@ describe('openFile', () => {
         callback: (err: NodeJS.ErrnoException | null) => void
       ) => callback(new Error())
     );
-    const spyOnGetNewPathOfRenamedFile = jest.spyOn(dataSource, 'getNewPathOfRenamedFile');
+    const spyOnGetNewPathOfRenamedFile = vi.spyOn(dataSource, 'getNewPathOfRenamedFile');
     spyOnGetNewPathOfRenamedFile.mockResolvedValueOnce('renamed-new.txt');
 
     // Run
@@ -2164,7 +2172,7 @@ describe('viewDiffWithWorkingFile', () => {
       ) => callback(null)
     );
     vscode.commands.executeCommand.mockResolvedValueOnce(null);
-    const spyOnGetNewPathOfRenamedFile = jest.spyOn(dataSource, 'getNewPathOfRenamedFile');
+    const spyOnGetNewPathOfRenamedFile = vi.spyOn(dataSource, 'getNewPathOfRenamedFile');
     spyOnGetNewPathOfRenamedFile.mockResolvedValueOnce('subfolder/renamed-new.txt');
 
     // Run
@@ -2223,7 +2231,7 @@ describe('viewDiffWithWorkingFile', () => {
       ) => callback(new Error())
     );
     vscode.commands.executeCommand.mockResolvedValueOnce(null);
-    const spyOnGetNewPathOfRenamedFile = jest.spyOn(dataSource, 'getNewPathOfRenamedFile');
+    const spyOnGetNewPathOfRenamedFile = vi.spyOn(dataSource, 'getNewPathOfRenamedFile');
     spyOnGetNewPathOfRenamedFile.mockResolvedValueOnce(null);
 
     // Run
@@ -2281,7 +2289,7 @@ describe('viewDiffWithWorkingFile', () => {
       ) => callback(new Error())
     );
     vscode.commands.executeCommand.mockResolvedValueOnce(null);
-    const spyOnGetNewPathOfRenamedFile = jest.spyOn(dataSource, 'getNewPathOfRenamedFile');
+    const spyOnGetNewPathOfRenamedFile = vi.spyOn(dataSource, 'getNewPathOfRenamedFile');
     spyOnGetNewPathOfRenamedFile.mockResolvedValueOnce('subfolder/renamed-new.txt');
 
     // Run
@@ -2750,7 +2758,7 @@ describe('findGit', () => {
 
   it('Should use the last known Git executable path if it still exists', async () => {
     // Setup
-    jest.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce('/path/to/git');
+    vi.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce('/path/to/git');
     mockSpawnGitVersionSuccessOnce();
 
     // Run
@@ -2766,7 +2774,7 @@ describe('findGit', () => {
 
   it('Should use the users git.path if the last known Git executable path no longer exists', async () => {
     // Setup
-    jest.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce('/path/to/not-git');
+    vi.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce('/path/to/not-git');
     vscode.mockExtensionSettingReturnValue('path', '/path/to/git');
     mockSpawnGitVersionThrowingErrorOnce();
     mockSpawnGitVersionSuccessOnce();
@@ -2784,7 +2792,7 @@ describe('findGit', () => {
 
   it('Should use the users git.path if there is no last known Git executable path', async () => {
     // Setup
-    jest.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce(null);
+    vi.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce(null);
     vscode.mockExtensionSettingReturnValue('path', '/path/to/git');
     mockSpawnGitVersionSuccessOnce();
 
@@ -2800,12 +2808,12 @@ describe('findGit', () => {
   });
 
   describe("process.platform === 'darwin'", () => {
-    let spyOnExec: jest.SpyInstance;
+    let spyOnExec: MockInstance;
     beforeEach(() => {
-      jest.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce(null);
+      vi.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce(null);
       vscode.mockExtensionSettingReturnValue('path', null);
       Object.defineProperty(process, 'platform', { value: 'darwin' });
-      spyOnExec = jest.spyOn(cp, 'exec');
+      spyOnExec = vi.spyOn(cp, 'exec');
     });
 
     it('Should find and return the Git executable using "which git"', async () => {
@@ -2962,7 +2970,7 @@ describe('findGit', () => {
       localAppData: string | undefined,
       envPath: string | undefined;
     beforeEach(() => {
-      jest.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce(null);
+      vi.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce(null);
       vscode.mockExtensionSettingReturnValue('path', []);
       programW6432 = process.env['ProgramW6432'];
       programFilesX86 = process.env['ProgramFiles(x86)'];
@@ -3149,7 +3157,7 @@ describe('findGit', () => {
 
   describe("process.platform === 'unknown'", () => {
     beforeEach(() => {
-      jest.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce(null);
+      vi.spyOn(extensionState, 'getLastKnownGitPath').mockReturnValueOnce(null);
       vscode.mockExtensionSettingReturnValue('path', null);
       Object.defineProperty(process, 'platform', { value: 'unknown' });
     });

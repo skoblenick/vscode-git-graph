@@ -1,27 +1,23 @@
 import * as date from './mocks/date';
 import * as vscode from './mocks/vscode';
-jest.mock('vscode', () => vscode, { virtual: true });
-jest.mock('../src/logger');
+
+vi.mock('../src/logger');
 
 import { Logger } from '../src/logger';
 import { RepoFileWatcher } from '../src/repoFileWatcher';
 
 let logger: Logger;
-let spyOnLog: jest.SpyInstance;
+let spyOnLog: MockInstance;
 
 beforeAll(() => {
   logger = new Logger();
-  spyOnLog = jest.spyOn(logger, 'log');
-  jest.useFakeTimers();
+  spyOnLog = vi.spyOn(logger, 'log');
+  vi.useFakeTimers();
 });
 
 afterAll(() => {
   logger.dispose();
 });
-
-function getFirstWatcher(repoFileWatcher: RepoFileWatcher) {
-  return repoFileWatcher['fsWatchers'][0];
-}
 
 function getAllWatchers(repoFileWatcher: RepoFileWatcher) {
   return repoFileWatcher['fsWatchers'] as ReturnType<
@@ -31,24 +27,24 @@ function getAllWatchers(repoFileWatcher: RepoFileWatcher) {
 
 function getOnDidCreate(repoFileWatcher: RepoFileWatcher, index = 0) {
   const watcher = getAllWatchers(repoFileWatcher)[index];
-  return (<jest.Mock<any, any>>watcher.onDidCreate).mock.calls[0][0];
+  return (<Mock<any, any>>watcher.onDidCreate).mock.calls[0][0];
 }
 
 function getOnDidChange(repoFileWatcher: RepoFileWatcher, index = 0) {
   const watcher = getAllWatchers(repoFileWatcher)[index];
-  return (<jest.Mock<any, any>>watcher.onDidChange).mock.calls[0][0];
+  return (<Mock<any, any>>watcher.onDidChange).mock.calls[0][0];
 }
 
 function getOnDidDelete(repoFileWatcher: RepoFileWatcher, index = 0) {
   const watcher = getAllWatchers(repoFileWatcher)[index];
-  return (<jest.Mock<any, any>>watcher.onDidDelete).mock.calls[0][0];
+  return (<Mock<any, any>>watcher.onDidDelete).mock.calls[0][0];
 }
 
 describe('RepoFileWatcher', () => {
   let repoFileWatcher: RepoFileWatcher;
-  let callback: jest.Mock;
+  let callback: Mock;
   beforeEach(() => {
-    callback = jest.fn();
+    callback = vi.fn();
     repoFileWatcher = new RepoFileWatcher(logger, callback);
   });
 
@@ -82,7 +78,7 @@ describe('RepoFileWatcher', () => {
     onDidCreate(vscode.Uri.file('/path/to/repo/.git/HEAD'));
     onDidChange(vscode.Uri.file('/path/to/repo/.git/HEAD'));
     onDidDelete(vscode.Uri.file('/path/to/repo/.git/HEAD'));
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
 
     expect(callback).toHaveBeenCalledTimes(1);
   });
@@ -94,10 +90,10 @@ describe('RepoFileWatcher', () => {
 
     onDidCreate(vscode.Uri.file('/path/to/repo1/.git/HEAD'));
     repoFileWatcher.start('/path/to/repo2');
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
 
     for (const watcher of watchers) {
-      expect(<jest.Mock<any, any>>watcher.dispose).toHaveBeenCalledTimes(1);
+      expect(<Mock<any, any>>watcher.dispose).toHaveBeenCalledTimes(1);
     }
     expect(callback).toHaveBeenCalledTimes(0);
   });
@@ -115,7 +111,7 @@ describe('RepoFileWatcher', () => {
     repoFileWatcher.stop();
 
     for (const watcher of watchers) {
-      expect(<jest.Mock<any, any>>watcher.dispose).toHaveBeenCalledTimes(1);
+      expect(<Mock<any, any>>watcher.dispose).toHaveBeenCalledTimes(1);
     }
     expect(repoFileWatcher['fsWatchers']).toHaveLength(0);
   });
@@ -126,7 +122,7 @@ describe('RepoFileWatcher', () => {
 
     repoFileWatcher.mute();
     onDidCreate(vscode.Uri.file('/path/to/repo/.git/HEAD'));
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
 
     expect(callback).toHaveBeenCalledTimes(0);
   });
@@ -142,7 +138,7 @@ describe('RepoFileWatcher', () => {
     onDidCreate(vscode.Uri.file('/path/to/repo/.git/HEAD'));
     date.setCurrentTime(1587559260);
     onDidChange(vscode.Uri.file('/path/to/repo/.git/HEAD'));
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
 
     expect(callback).toHaveBeenCalledTimes(1);
   });
@@ -153,7 +149,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/HEAD'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(1);
     });
@@ -163,7 +159,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/index'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(1);
     });
@@ -173,7 +169,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/refs/heads/main'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(1);
     });
@@ -183,7 +179,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/refs/stash'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(1);
     });
@@ -193,7 +189,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/packed-refs'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(1);
     });
@@ -203,7 +199,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/config'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(1);
     });
@@ -213,7 +209,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/FETCH_HEAD'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(1);
     });
@@ -223,7 +219,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/ORIG_HEAD'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(1);
     });
@@ -233,7 +229,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/src/file.ts'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(0);
     });
@@ -243,7 +239,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.gitignore'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(0);
     });
@@ -253,7 +249,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/config-x'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(0);
     });
@@ -263,7 +259,7 @@ describe('RepoFileWatcher', () => {
       const onDidChange = getOnDidChange(repoFileWatcher);
 
       onDidChange(vscode.Uri.file('/path/to/repo/.git/objects/ab/1234'));
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
 
       expect(callback).toHaveBeenCalledTimes(0);
     });

@@ -87,7 +87,7 @@ const GIT_SIGNATURE_STATUS_DESCRIPTIONS = {
   B: 'Bad Signature'
 };
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const REF_INVALID_REGEX = /^[-\/].*|[\\" ><~^:?*[]|\.\.|\/\/|\/\.|@{|[.\/]$|\.lock$|^@$/g;
+const REF_INVALID_REGEX = /^[-/].*|[\\" ><~^:?*[]|\.\.|\/\/|\/\.|@{|[./]$|\.lock$|^@$/g;
 
 const HTML_ESCAPES: { [key: string]: string } = {
   '&': '&amp;',
@@ -105,7 +105,7 @@ const HTML_UNESCAPES: { [key: string]: string } = {
   '&#x27;': "'",
   '&#x2F;': '/'
 };
-const HTML_ESCAPER_REGEX = /[&<>"'\/]/g;
+const HTML_ESCAPER_REGEX = /[&<>"'/]/g;
 const HTML_UNESCAPER_REGEX = /&lt;|&gt;|&amp;|&quot;|&#x27;|&#x2F;/g;
 
 const ELLIPSIS = '&#8230;';

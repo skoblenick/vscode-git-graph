@@ -1,4 +1,4 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 import * as vm from 'vm';
 import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
@@ -60,20 +60,20 @@ function createFullMockView(
   };
 
   const mockGraph = {
-    render: jest.fn(),
-    getVertexColours: jest.fn().mockReturnValue([]),
-    getWidthsAtVertices: jest.fn().mockReturnValue([]),
-    getMutedCommits: jest.fn().mockReturnValue({}),
-    getContentWidth: jest.fn().mockReturnValue(100),
-    limitMaxWidth: jest.fn()
+    render: vi.fn(),
+    getVertexColours: vi.fn().mockReturnValue([]),
+    getWidthsAtVertices: vi.fn().mockReturnValue([]),
+    getMutedCommits: vi.fn().mockReturnValue({}),
+    getContentWidth: vi.fn().mockReturnValue(100),
+    limitMaxWidth: vi.fn()
   };
 
   const mockFindWidget = {
-    refresh: jest.fn()
+    refresh: vi.fn()
   };
 
   const mockBranchDropdown = {
-    setOptions: jest.fn()
+    setOptions: vi.fn()
   };
 
   ctx.mockView = {
@@ -104,13 +104,13 @@ function createFullMockView(
       return lookup;
     },
     isCdvDocked: () => false,
-    setRenderedGitBranchHead: jest.fn(),
-    saveColumnWidths: jest.fn(),
-    closeCommitDetails: jest.fn(),
-    saveState: jest.fn(),
-    saveRepoState: jest.fn(),
-    renderGraph: jest.fn(),
-    loadMoreCommits: jest.fn(),
+    setRenderedGitBranchHead: vi.fn(),
+    saveColumnWidths: vi.fn(),
+    closeCommitDetails: vi.fn(),
+    saveState: vi.fn(),
+    saveRepoState: vi.fn(),
+    renderGraph: vi.fn(),
+    loadMoreCommits: vi.fn(),
     getCommitId: (hash: string) => {
       const lookup: Record<string, number> = {};
       defaults.commits.forEach((c: any, i: number) => {
@@ -118,24 +118,24 @@ function createFullMockView(
       });
       return typeof lookup[hash] === 'number' ? lookup[hash] : null;
     },
-    loadCommitDetails: jest.fn(),
-    showCommitDetails: jest.fn(),
-    requestCommitDetails: jest.fn(),
-    loadCommitComparison: jest.fn(),
-    showCommitComparison: jest.fn(),
-    requestCommitComparison: jest.fn(),
+    loadCommitDetails: vi.fn(),
+    showCommitDetails: vi.fn(),
+    requestCommitDetails: vi.fn(),
+    loadCommitComparison: vi.fn(),
+    showCommitComparison: vi.fn(),
+    requestCommitComparison: vi.fn(),
     getNumColumns: () => 5,
-    refresh: jest.fn(),
-    saveRepoStateValue: jest.fn(),
+    refresh: vi.fn(),
+    saveRepoStateValue: vi.fn(),
     getRepoDropdown: () => mockBranchDropdown,
     getGitRemotes: () => [],
     getRefreshBtnElem: () => document.createElement('div'),
     isRefreshInProgress: () => false
   };
 
-  sandbox.addListenerToClass = jest.fn();
-  sandbox.eventOverlay = { create: jest.fn(), remove: jest.fn() };
-  sandbox.contextMenu = { close: jest.fn(), show: jest.fn() };
+  sandbox.addListenerToClass = vi.fn();
+  sandbox.eventOverlay = { create: vi.fn(), remove: vi.fn() };
+  sandbox.contextMenu = { close: vi.fn(), show: vi.fn() };
 
   return { defaults, mockGraph, mockFindWidget, tableElem, footerElem, viewElem };
 }
@@ -281,8 +281,10 @@ describe('tableRenderer render functions', () => {
     const webCtx = createWebContext();
     ctx = webCtx.ctx;
     sandbox = webCtx.sandbox;
-    sandbox.TextFormatter = jest.fn().mockImplementation(() => ({ format: (s: string) => s }));
-    sandbox.generateSignatureHtml = jest.fn().mockReturnValue('');
+    sandbox.TextFormatter = vi.fn().mockImplementation(function () {
+      return { format: (s: string) => s };
+    });
+    sandbox.generateSignatureHtml = vi.fn().mockReturnValue('');
     loadWebFiles(ctx, [
       'utils.ts',
       'repoStateHelpers.ts',

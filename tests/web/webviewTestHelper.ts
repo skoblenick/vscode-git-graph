@@ -48,9 +48,9 @@ const GG_ENUMS: Record<string, any> = {
 
 export function createWebContext() {
   const vsCodeApi = {
-    getState: jest.fn().mockReturnValue(null),
-    postMessage: jest.fn(),
-    setState: jest.fn()
+    getState: vi.fn().mockReturnValue(null),
+    postMessage: vi.fn(),
+    setState: vi.fn()
   };
 
   const sandbox: Record<string, any> = {

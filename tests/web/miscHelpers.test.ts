@@ -1,4 +1,4 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 import * as vm from 'vm';
 import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 

@@ -216,7 +216,7 @@ export class AvatarManager extends Disposable {
           let match;
           if (
             (match = remoteUrl.match(
-              /^(https:\/\/github\.com\/|git@github\.com:)([^\/]+)\/(.*)\.git$/
+              /^(https:\/\/github\.com\/|git@github\.com:)([^/]+)\/(.*)\.git$/
             )) !== null
           ) {
             remoteSource = { type: 'github', owner: match[2], repo: match[3] };

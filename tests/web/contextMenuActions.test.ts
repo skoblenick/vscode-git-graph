@@ -1,4 +1,4 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 import * as vm from 'vm';
 import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
@@ -117,7 +117,7 @@ function createMockView(
       fetchAndPrune: false,
       fetchAndPruneTags: false
     },
-    branchDropdown: { isSelected: () => false, selectOption: jest.fn(), unselectOption: jest.fn() },
+    branchDropdown: { isSelected: () => false, selectOption: vi.fn(), unselectOption: vi.fn() },
     onlyFollowFirstParent: false,
     graphObj: { dropCommitPossible: () => true },
     pushRemote: 'origin',
@@ -139,7 +139,7 @@ function createMockView(
     getOnlyFollowFirstParent: () => defaults.onlyFollowFirstParent,
     getGraph: () => defaults.graphObj,
     getPushRemote: (_branch: string) => defaults.pushRemote,
-    saveRepoState: jest.fn()
+    saveRepoState: vi.fn()
   };
 
   return defaults;
@@ -160,7 +160,7 @@ function createTarget(ctx: vm.Context, overrides: Record<string, any> = {}) {
 describe('contextMenuActions', () => {
   let ctx: vm.Context;
   let sandbox: Record<string, any>;
-  let vsCodeApi: { getState: jest.Mock; postMessage: jest.Mock; setState: jest.Mock };
+  let vsCodeApi: { getState: Mock; postMessage: Mock; setState: Mock };
 
   beforeEach(() => {
     const webCtx = createWebContext();
@@ -169,23 +169,23 @@ describe('contextMenuActions', () => {
     vsCodeApi = webCtx.vsCodeApi;
 
     sandbox.dialog = {
-      showError: jest.fn(),
-      showConfirmation: jest.fn(),
-      showForm: jest.fn(),
-      showRefInput: jest.fn(),
-      showSelect: jest.fn(),
-      showCheckbox: jest.fn(),
-      showTwoButtons: jest.fn(),
-      showMultiSelect: jest.fn(),
-      showActionRunning: jest.fn(),
-      closeActionRunning: jest.fn()
+      showError: vi.fn(),
+      showConfirmation: vi.fn(),
+      showForm: vi.fn(),
+      showRefInput: vi.fn(),
+      showSelect: vi.fn(),
+      showCheckbox: vi.fn(),
+      showTwoButtons: vi.fn(),
+      showMultiSelect: vi.fn(),
+      showActionRunning: vi.fn(),
+      closeActionRunning: vi.fn()
     };
-    sandbox.contextMenu = { close: jest.fn() };
-    sandbox.updateGlobalViewState = jest.fn();
+    sandbox.contextMenu = { close: vi.fn() };
+    sandbox.updateGlobalViewState = vi.fn();
     sandbox.globalState = { alwaysAcceptCheckoutCommit: false, pushTagSkipRemoteCheck: false };
 
-    sandbox.parseIssueLinkingConfig = jest.fn().mockReturnValue(null);
-    sandbox.generateIssueLinkFromMatch = jest.fn();
+    sandbox.parseIssueLinkingConfig = vi.fn().mockReturnValue(null);
+    sandbox.generateIssueLinkFromMatch = vi.fn();
 
     loadWebFiles(ctx, ['utils.ts', 'miscHelpers.ts', 'contextMenuActions.ts']);
   });

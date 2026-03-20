@@ -1,15 +1,13 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 import * as vm from 'vm';
 import { createRepoState, createWebContext, loadWebFiles } from './webviewTestHelper';
 
 describe('web/utils', () => {
   let ctx: vm.Context;
-  let sandbox: Record<string, any>;
 
   beforeEach(() => {
     const webCtx = createWebContext();
     ctx = webCtx.ctx;
-    sandbox = webCtx.sandbox;
     loadWebFiles(ctx, ['utils.ts']);
   });
 

@@ -102,7 +102,7 @@ export class CommandManager extends Disposable {
         'git-graph:codiconsSupported',
         doesVersionMeetRequirement(vscode.version, VsCodeVersionRequirement.Codicons)
       );
-    } catch (_) {
+    } catch {
       this.logger.logError(
         'Unable to set Visual Studio Code Context "git-graph:codiconsSupported"'
       );
@@ -484,7 +484,7 @@ export class CommandManager extends Disposable {
         },
         () => {}
       );
-    } catch (_) {
+    } catch {
       showErrorMessage('An unexpected error occurred while retrieving version information.');
     }
   }
